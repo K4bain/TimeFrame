@@ -1,0 +1,15 @@
+# env
+.env
+.env.local
+.env.*.local
+
+# drizzle
+drizzle/
+
+# next.js
+.next/
+
+# deps
+node_modules/
+
+.vercel

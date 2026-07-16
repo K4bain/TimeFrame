@@ -1,0 +1,52 @@
+{
+  "name": "timeframe",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@radix-ui/react-slot": "^1.3.0",
+    "@supabase/supabase-js": "^2.110.6",
+    "@tanstack/react-query": "^5.101.2",
+    "@trpc/client": "^11.18.0",
+    "@trpc/next": "^11.18.0",
+    "@trpc/react-query": "^11.18.0",
+    "@trpc/server": "^11.18.0",
+    "@upstash/redis": "^1.38.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "drizzle-orm": "^0.45.2",
+    "framer-motion": "^12.12.1",
+    "geist": "^1.7.2",
+    "lucide-react": "^1.24.0",
+    "next": "^15.3.3",
+    "postgres": "^3.4.9",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "superjson": "^2.2.6",
+    "tailwind-merge": "^3.3.0",
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^4.4.3",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.7",
+    "@types/node": "^22.15.21",
+    "@types/react": "^19.1.22",
+    "@types/react-dom": "^19.1.2",
+    "drizzle-kit": "^0.31.10",
+    "eslint": "^9.26.0",
+    "eslint-config-next": "^15.3.3",
+    "postcss": "^8.5.4",
+    "tailwindcss": "^4.1.7",
+    "typescript": "^5.8.3"
+  }
+}

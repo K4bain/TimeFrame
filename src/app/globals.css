@@ -1,0 +1,91 @@
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+
+@theme {
+  --font-sans: var(--font-geist), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "Cascadia Code", monospace;
+
+  --color-bg-base: #0D0D0F;
+  --color-bg-surface: #131316;
+  --color-bg-elevated: #1C1C21;
+  --color-bg-input: #1C1C21;
+  --color-bg-hover: #26262D;
+  --color-bg-selected: #26262D;
+  --color-bg-disabled: #131316;
+
+  --color-border-subtle: #26262D;
+  --color-border-default: #34343D;
+  --color-border-strong: #4A4A57;
+  --color-border-focus: #D4873D;
+  --color-border-focus-neutral: #C4C4CE;
+
+  --color-text-primary: #E8E8EE;
+  --color-text-secondary: #C4C4CE;
+  --color-text-tertiary: #9595A3;
+  --color-text-muted: #6B6B7B;
+  --color-text-disabled: #4A4A57;
+  --color-text-inverse: #0D0D0F;
+  --color-text-link: #2E86C1;
+  --color-text-link-hover: #F4F4F7;
+
+  --color-temporal-primary: #D4873D;
+  --color-temporal-hover: #E8A050;
+  --color-temporal-subtle: #F2B86A;
+  --color-temporal-dark: #B87333;
+  --color-temporal-text: #E8A050;
+  --color-temporal-border: #B87333;
+  --color-temporal-bg: #FDF3E3;
+
+  --color-error: #E74C3C;
+  --color-error-bg: #C0392B;
+  --color-error-border: #C0392B;
+  --color-success: #2ECC71;
+  --color-success-bg: #27AE60;
+  --color-info: #2E86C1;
+  --color-info-bg: #2471A3;
+
+  --color-background: #0D0D0F;
+  --color-foreground: #E8E8EE;
+  --color-muted: #6B6B7B;
+  --color-border: #34343D;
+  --color-accent: #D4873D;
+  --color-accent-hover: #E8A050;
+  --color-surface: #131316;
+  --color-card: #131316;
+  --color-card-foreground: #E8E8EE;
+  --color-popover: #1C1C21;
+  --color-popover-foreground: #E8E8EE;
+  --color-primary: #D4873D;
+  --color-primary-foreground: #0D0D0F;
+  --color-secondary: #1C1C21;
+  --color-secondary-foreground: #E8E8EE;
+  --color-destructive: #C0392B;
+  --color-destructive-foreground: #F4F4F7;
+  --color-ring: #D4873D;
+  --color-input: #34343D;
+
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.6);
+  --shadow-xl: 0 16px 48px rgba(0,0,0,0.7);
+  --shadow-temporal: 0 0 0 1px #B87333, 0 0 12px rgba(184,115,51,0.2);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
