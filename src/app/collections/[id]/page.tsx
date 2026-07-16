@@ -41,7 +41,7 @@ export default function CollectionDetailPage() {
       for (const site of coll!.websites) {
         try {
           const res = await fetch(
-            `/api/trpc/archive.getTimeline?batch=1&input=${encodeURIComponent(
+            `https://timeframe-backend.vercel.app/api/trpc/archive.getTimeline?batch=1&input=${encodeURIComponent(
               JSON.stringify({ 0: { json: { domain: site } } })
             )}`
           );

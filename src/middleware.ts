@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 function getBackendOrigin(): string {
-  return "";
+  return "https://timeframe-backend.vercel.app";
 }
 
 function generateCSP(): string {

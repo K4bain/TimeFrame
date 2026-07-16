@@ -20,7 +20,7 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: '/api/trpc',
+          url: 'https://timeframe-backend.vercel.app/api/trpc',
           transformer: superjson,
         }),
       ],
