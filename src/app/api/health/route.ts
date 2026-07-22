@@ -1,14 +1,22 @@
 import { NextResponse } from 'next/server';
-import { searchCDX } from '@/server/services/archive';
+import { cachedFetch, getCacheKey } from '@/server/services/cache-service';
 
 export async function GET() {
   try {
-    const results = await searchCDX('example.com', { limit: 1 });
-    const hasData = Array.isArray(results) && results.length > 0;
+    const result = await cachedFetch(
+      getCacheKey("health", "archive"),
+      async () => {
+        const response = await fetch('https://web.archive.org/cdx/search/cdx?url=example.com&output=json&fl=timestamp&limit=1&matchType=host');
+        if (!response.ok) throw new Error('CDX request failed');
+        const data = await response.json();
+        return Array.isArray(data) && data.length > 1;
+      },
+      60
+    );
     return NextResponse.json({
-      status: hasData ? 'ok' : 'degraded',
+      status: result ? 'ok' : 'degraded',
       timestamp: new Date().toISOString(),
-      checks: { archive: hasData ? 'ok' : 'no_data' },
+      checks: { archive: result ? 'ok' : 'no_data' },
     });
   } catch {
     return NextResponse.json({

@@ -1,5 +1,3 @@
-const FIVE_MINUTES = 5 * 60;
-
 let redisInstance: unknown = null;
 let redisChecked = false;
 const memory = new Map<string, { data: unknown; expires: number }>();
@@ -35,7 +33,7 @@ function memorySet(key: string, data: unknown, ttlMs: number): void {
 export async function cachedFetch<T>(
   key: string,
   fetcher: () => Promise<T>,
-  ttlSeconds: number = FIVE_MINUTES
+  ttlSeconds: number = 300
 ): Promise<T> {
   const r = await getRedis() as { get: <T>(k: string) => Promise<T | null>; set: (k: string, v: unknown, opts: { ex: number }) => Promise<void> } | null;
   if (r) {
@@ -62,5 +60,5 @@ export async function cachedFetch<T>(
 }
 
 export function getCacheKey(prefix: string, ...parts: (string | number | undefined)[]): string {
-  return `${prefix}:${parts.filter(Boolean).join(':')}`;
+  return `${prefix}:${parts.map(p => p ?? '').join(':')}`;
 }

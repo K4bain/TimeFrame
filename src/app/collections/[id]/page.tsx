@@ -1,14 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, Loader2, ExternalLink } from "lucide-react";
+import { Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { SiteHeader } from "@/components/layout/site-header";
 import { getCollection } from "@/features/collections/data";
 import { formatDate } from "@/utils";
 import Link from "next/link";
+import { trpc } from "@/lib/api/trpc";
 import type { Collection } from "@/types";
+
+const HERO_EASE = [0.16, 1, 0.3, 1] as const;
 
 interface SiteSnapshot {
   site: string;
@@ -25,42 +30,41 @@ export default function CollectionDetailPage() {
   const [snapshots, setSnapshots] = useState<SiteSnapshot[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const utils = trpc.useUtils();
+  const utilsRef = useRef(utils);
+  utilsRef.current = utils;
+
   useEffect(() => {
     const coll = getCollection(id);
     if (!coll) {
       setIsLoading(false);
       return;
     }
-
     setCollection(coll);
 
     let cancelled = false;
 
     async function loadSites() {
-      const results: SiteSnapshot[] = [];
-      for (const site of coll!.websites) {
-        try {
-          const res = await fetch(
-            `https://timeframe-backend.vercel.app/api/trpc/archive.getTimeline?batch=1&input=${encodeURIComponent(
-              JSON.stringify({ 0: { json: { domain: site } } })
-            )}`
-          );
-          const json = await res.json();
-          const data = json[0]?.result?.data?.json;
-          if (data?.success && data.data.totalCount > 0) {
-            results.push({
-              site,
-              firstCapture: data.data.firstSnapshot,
-              lastCapture: data.data.lastSnapshot,
-              totalCaptures: data.data.totalCount,
-            });
+      const results = await Promise.all(
+        coll!.websites.map(async (site) => {
+          try {
+            const data = await utilsRef.current.archive.getTimeline.fetch({ domain: site });
+            if (data.success && data.data.totalCount > 0) {
+              return {
+                site,
+                firstCapture: data.data.firstSnapshot,
+                lastCapture: data.data.lastSnapshot,
+                totalCaptures: data.data.totalCount,
+              };
+            }
+          } catch {
+            // Skip failed sites
           }
-        } catch {
-          // Skip failed sites
-        }
-      }
+          return null;
+        })
+      );
       if (!cancelled) {
-        setSnapshots(results);
+        setSnapshots(results.filter((r): r is NonNullable<typeof r> => r !== null));
         setIsLoading(false);
       }
     }
@@ -72,23 +76,18 @@ export default function CollectionDetailPage() {
 
   return (
     <main className="min-h-screen">
-      <div className="fixed top-0 left-0 right-0 z-50 bg-bg-base/80 backdrop-blur-sm border-b border-border-subtle">
-        <div className="max-w-5xl mx-auto px-4 md:px-16 py-4 flex items-center gap-4">
-          <Link href="/collections">
-            <Button variant="ghost" size="icon" aria-label="Back to collections">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
-          <h1 className="text-lg font-semibold truncate">{collection?.title || "Collection"}</h1>
-        </div>
-      </div>
+      <SiteHeader
+        backHref="/collections"
+        backLabel="Back to collections"
+        title={collection?.title || "Collection"}
+      />
 
-      <div className="pt-24 pb-8 px-4 md:px-16">
-        <div className="max-w-5xl mx-auto">
+      <div className="pt-[52px]">
+        <div className="max-w-5xl mx-auto px-4 md:px-6 py-10 md:py-14">
           {isLoading && (
             <div className="flex flex-col items-center justify-center py-20">
               <Loader2 className="w-8 h-8 text-text-muted animate-spin mb-4" />
-              <p className="text-text-muted">Loading collection...</p>
+              <p className="text-text-muted">Loading collection…</p>
             </div>
           )}
 
@@ -107,11 +106,21 @@ export default function CollectionDetailPage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
+              transition={{ duration: 0.4, ease: HERO_EASE }}
             >
-              <div className="mb-8">
-                <h2 className="text-2xl md:text-3xl font-semibold mb-2">{collection.title}</h2>
-                <p className="text-text-tertiary max-w-2xl">{collection.description}</p>
+              <div className="mb-10">
+                <Link
+                  href="/collections"
+                  className="text-2xs uppercase tracking-[0.2em] text-temporal-text font-medium hover:text-temporal-hover transition-colors"
+                >
+                  ← Exhibit
+                </Link>
+                <h1 className="text-display text-4xl md:text-5xl text-text-primary mt-3 mb-3">
+                  {collection.title}
+                </h1>
+                <p className="text-text-tertiary max-w-2xl leading-relaxed">
+                  {collection.description}
+                </p>
               </div>
 
               {snapshots.length === 0 && (
@@ -126,28 +135,29 @@ export default function CollectionDetailPage() {
                     key={snapshot.site}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: i * 0.05 }}
+                    transition={{ duration: 0.4, ease: HERO_EASE, delay: i * 0.05 }}
                   >
-                    <Link
-                      href={`/explore/${snapshot.site}/${snapshot.lastCapture}`}
-                      className="block p-6 bg-bg-surface border border-border-default rounded-md hover:border-border-focus transition-colors duration-150 group"
-                    >
-                      <div className="flex items-start justify-between mb-4">
-                        <div>
-                          <h3 className="font-medium group-hover:text-temporal-text transition-colors">
-                            {snapshot.site}
-                          </h3>
-                          <p className="text-sm text-text-muted">
-                            {snapshot.totalCaptures.toLocaleString()} snapshots
-                          </p>
-                        </div>
-                        <ExternalLink className="w-4 h-4 text-text-muted group-hover:text-temporal-text transition-colors" />
-                      </div>
+                    <Link href={`/explore/${snapshot.site}/${snapshot.firstCapture}`} className="block group">
+                      <Card className="h-full hover:border-border-focus hover:shadow-md transition-all duration-150">
+                        <div className="p-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <div>
+                              <h3 className="text-display text-lg text-text-primary group-hover:text-temporal-text transition-colors">
+                                {snapshot.site}
+                              </h3>
+                              <p className="text-sm text-text-muted">
+                                {snapshot.totalCaptures.toLocaleString()} snapshots
+                              </p>
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-text-muted group-hover:text-temporal-text transition-colors" aria-hidden="true" />
+                          </div>
 
-                      <div className="text-xs text-text-muted font-mono">
-                        <p>First: {formatDate(snapshot.firstCapture)}</p>
-                        <p>Last: {formatDate(snapshot.lastCapture)}</p>
-                      </div>
+                          <div className="text-xs text-text-muted font-mono space-y-1 pt-3 border-t border-border-subtle">
+                            <p>First: <span className="text-temporal-text">{formatDate(snapshot.firstCapture)}</span></p>
+                            <p>Last: <span className="text-temporal-text">{formatDate(snapshot.lastCapture)}</span></p>
+                          </div>
+                        </div>
+                      </Card>
                     </Link>
                   </motion.div>
                 ))}

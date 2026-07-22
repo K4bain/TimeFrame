@@ -9,6 +9,7 @@ interface CDXRow {
   original: string;
   mimetype: string;
   statuscode: string;
+  length: string;
 }
 
 async function fetchWithTimeout(url: string, timeout: number = FETCH_TIMEOUT): Promise<Response> {
@@ -33,8 +34,9 @@ export async function searchCDX(
       const params = new URLSearchParams({
         url,
         output: "json",
-        fl: "timestamp,original,mimetype,statuscode",
-        matchType: "host",
+        fl: "timestamp,original,mimetype,statuscode,length",
+        matchType: "domain",
+        filter: "statuscode:200",
         ...(options?.from && { from: String(options.from) }),
         ...(options?.to && { to: String(options.to) }),
         ...(options?.limit && { limit: String(options.limit) }),

@@ -29,18 +29,17 @@ export function ContextPanel({
 }: ContextPanelProps) {
   const { data: siteContext } = trpc.context.getSiteContext.useQuery(
     { domain },
-    { enabled: typeof window !== 'undefined' && domain.length > 0 }
+    { enabled: domain.length > 0 }
   );
 
   const selectedTimestamp = selectedCapture?.timestamp || "";
   const { data: snapshotContext } = trpc.context.getSnapshotContext.useQuery(
     { domain, timestamp: selectedTimestamp },
-    { enabled: typeof window !== 'undefined' && domain.length > 0 && selectedTimestamp.length > 0 }
+    { enabled: domain.length > 0 && selectedTimestamp.length > 0 }
   );
 
   const { data: erasData } = trpc.context.getEras.useQuery(undefined, {
     staleTime: 1000 * 60 * 60 * 24,
-    enabled: typeof window !== 'undefined',
   });
 
   const eraInfo = useMemo(() => {
@@ -128,7 +127,7 @@ export function ContextPanel({
           <p>
             Coverage:{" "}
             <Badge variant="temporal">
-              {coverageQuality?.toLowerCase() === "good" ? "Good" : coverageQuality?.toLowerCase() === "moderate" ? "Moderate" : "Sparse"}
+              {coverageQuality ? coverageQuality.charAt(0).toUpperCase() + coverageQuality.slice(1) : "Sparse"}
             </Badge>
           </p>
         </div>

@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { trpc } from "@/lib/api/trpc";
-import { errorMessage } from "@/types/errors";
+import type { AppError } from "@/types/errors";
 import { normalizeUrl } from "@/utils";
 import type { Capture } from "@/types";
 
@@ -15,17 +15,20 @@ interface SearchResult {
 interface UseSearchReturn {
   result: SearchResult | null;
   isLoading: boolean;
-  error: string | null;
+  error: AppError | null;
   search: (query: string) => Promise<void>;
 }
 
 export function useSearch(): UseSearchReturn {
   const [result, setResult] = useState<SearchResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<AppError | null>(null);
   const utils = trpc.useUtils();
+  const mountedRef = useRef(true);
+  const generationRef = useRef(0);
 
   const search = useCallback(async (query: string) => {
+    const gen = ++generationRef.current;
     setIsLoading(true);
     setError(null);
     setResult(null);
@@ -33,19 +36,14 @@ export function useSearch(): UseSearchReturn {
     try {
       const site = normalizeUrl(query);
       if (!site) {
-        setError("Please enter a valid domain");
-        return;
-      }
-
-      const coverage = await utils.search.checkCoverage.fetch({ domain: site });
-      if (!coverage.success) {
-        setError(errorMessage(coverage.error));
+        setError({ code: "INVALID_INPUT", message: "Empty or invalid input" });
         return;
       }
 
       const timeline = await utils.archive.getTimeline.fetch({ domain: site });
+      if (gen !== generationRef.current) return;
       if (!timeline.success) {
-        setError(errorMessage(timeline.error));
+        setError(timeline.error);
         return;
       }
 
@@ -64,11 +62,13 @@ export function useSearch(): UseSearchReturn {
         totalCaptures: timeline.data.totalCount,
       });
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to search archive"
-      );
+      if (gen !== generationRef.current) return;
+      setError({
+        code: "UNKNOWN",
+        originalError: err instanceof Error ? err.message : undefined,
+      });
     } finally {
-      setIsLoading(false);
+      if (gen === generationRef.current) setIsLoading(false);
     }
   }, [utils]);
 

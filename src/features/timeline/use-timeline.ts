@@ -1,6 +1,7 @@
 import { useMemo, useCallback } from "react";
 import { trpc } from "@/lib/api/trpc";
-import { errorMessage } from "@/types/errors";
+import { daysBetweenTimestamps, yearFromTimestamp } from "@/utils/dates";
+import type { AppError } from "@/types/errors";
 import type { Capture } from "@/types";
 
 interface YearData {
@@ -14,7 +15,7 @@ interface UseTimelineReturn {
   years: YearData[];
   selectedCapture: Capture | null;
   isLoading: boolean;
-  error: string | null;
+  error: AppError | null;
   gaps: Set<number>;
   selectedIndex: number;
   goToNext: () => Capture | null;
@@ -22,24 +23,10 @@ interface UseTimelineReturn {
   goToYear: (year: number) => Capture | null;
 }
 
-function parseTimestampToDate(timestamp: string): Date {
-  const year = parseInt(timestamp.slice(0, 4), 10);
-  const month = parseInt(timestamp.slice(4, 6), 10) - 1;
-  const day = parseInt(timestamp.slice(6, 8), 10);
-  return new Date(year, month, day);
-}
-
-function daysBetween(a: string, b: string): number {
-  const dateA = parseTimestampToDate(a);
-  const dateB = parseTimestampToDate(b);
-  const diffMs = Math.abs(dateB.getTime() - dateA.getTime());
-  return Math.floor(diffMs / (1000 * 60 * 60 * 24));
-}
-
 function detectGaps(captures: Capture[]): Set<number> {
   const gaps = new Set<number>();
   for (let i = 1; i < captures.length; i++) {
-    const diff = daysBetween(captures[i - 1].timestamp, captures[i].timestamp);
+    const diff = daysBetweenTimestamps(captures[i - 1].timestamp, captures[i].timestamp);
     if (diff > 90) {
       gaps.add(i);
     }
@@ -53,8 +40,14 @@ export function useTimeline(
 ): UseTimelineReturn {
   const { data: result, isLoading, error } = trpc.archive.getTimeline.useQuery(
     { domain },
-    { enabled: typeof window !== 'undefined' && domain.length > 0 }
+    { enabled: domain.length > 0 }
   );
+
+  const resolvedError: AppError | null = error
+    ? { code: "ARCHIVE_UNAVAILABLE", retryable: true }
+    : result && !result.success
+      ? result.error
+      : null;
 
   const captures: Capture[] = useMemo(() => {
     if (result?.success) {
@@ -75,15 +68,15 @@ export function useTimeline(
     if (captures.length === 0) return [];
 
     const yearMap = new Map<number, Capture[]>();
-    const minYear = parseInt(captures[0].timestamp.slice(0, 4), 10);
-    const maxYear = parseInt(captures[captures.length - 1].timestamp.slice(0, 4), 10);
+    const minYear = yearFromTimestamp(captures[0].timestamp);
+    const maxYear = yearFromTimestamp(captures[captures.length - 1].timestamp);
 
     for (let y = minYear; y <= maxYear; y++) {
       yearMap.set(y, []);
     }
 
     captures.forEach((capture) => {
-      const year = parseInt(capture.timestamp.slice(0, 4), 10);
+      const year = yearFromTimestamp(capture.timestamp);
       yearMap.get(year)?.push(capture);
     });
 
@@ -132,7 +125,7 @@ export function useTimeline(
     years,
     selectedCapture,
     isLoading,
-    error: error ? error.message : (result && !result.success ? errorMessage(result.error) : null),
+    error: resolvedError,
     gaps,
     selectedIndex,
     goToNext,

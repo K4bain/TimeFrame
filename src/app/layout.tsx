@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { headers } from "next/headers";
+import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import { SkipNav } from "@/components/accessibility";
 import { TRPCProvider } from "@/lib/api/provider";
 import "./globals.css";
@@ -14,6 +15,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-geist-mono",
   display: "swap",
+});
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+  display: "swap",
+  axes: ["opsz", "SOFT", "WONK"],
 });
 
 export const metadata: Metadata = {
@@ -42,20 +50,26 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Read the per-request CSP nonce from middleware (SEC.1)
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+
   return (
-    <html lang="en" className={`${geist.variable} ${geistMono.variable}`}>
+    <html lang="en" className={`${geist.variable} ${geistMono.variable} ${fraunces.variable}`}>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        {nonce && (
+          <meta name="csp-nonce" content={nonce} />
+        )}
       </head>
-      <body className="antialiased">
+      <body className="antialiased tf-grain">
         <TRPCProvider>
           <SkipNav />
-          <div id="main-content">{children}</div>
+          <main id="main-content">{children}</main>
         </TRPCProvider>
       </body>
     </html>

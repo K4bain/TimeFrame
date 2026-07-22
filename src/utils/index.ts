@@ -13,15 +13,14 @@ export function getEra(timestamp: string): string {
   if (timestamp.length < 4) return "";
   const year = parseInt(timestamp.slice(0, 4), 10);
   if (isNaN(year)) return "";
-  if (year < 1996) return "Early Web";
-  if (year < 2001) return "Dot-com Era";
-  if (year < 2004) return "Post Bubble";
-  if (year < 2007) return "Web 2.0 Rise";
-  if (year < 2010) return "Social Emergence";
-  if (year < 2014) return "Mobile Shift";
-  if (year < 2018) return "Modern Web";
-  if (year < 2022) return "Contemporary";
-  return "Current Era";
+  if (year < 1996) return "early-web";
+  if (year < 2001) return "browser-wars";
+  if (year < 2004) return "post-crash";
+  if (year < 2009) return "web-20";
+  if (year < 2013) return "mobile-transition";
+  if (year < 2017) return "flat-design";
+  if (year < 2022) return "platform-web";
+  return "ai-transition";
 }
 
 export function getWaybackEmbedUrl(waybackUrl: string): string {
@@ -48,7 +47,7 @@ export function normalizeUrl(input: string): string {
 
     return hostname;
   } catch {
-    let domain = cleaned.replace(/^(https?:\/\/)?/, "").replace(/www\./, "").replace(/\/.*$/, "");
+    let domain = cleaned.replace(/^(https?:\/\/)?/, "").replace(/^www\./, "").replace(/\/.*$/, "");
     domain = domain.replace(/:.*$/, "");
     return domain;
   }

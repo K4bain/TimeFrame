@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { trpc } from "@/lib/api/trpc";
-import { errorMessage } from "@/types/errors";
+import { ERA_DISPLAY } from "@/lib/era-display";
+import type { AppError } from "@/types/errors";
 import { getEra, getWaybackEmbedUrl } from "@/utils";
 
 interface ViewerState {
@@ -8,7 +9,7 @@ interface ViewerState {
   timestamp: string;
   waybackUrl: string;
   isLoading: boolean;
-  error: string | null;
+  error: AppError | null;
   era: string;
 }
 
@@ -19,7 +20,7 @@ interface UseViewerReturn {
 export function useViewer(domain: string, timestamp: string): UseViewerReturn {
   const { data: result, isLoading, error } = trpc.archive.getSnapshot.useQuery(
     { domain, timestamp },
-    { enabled: typeof window !== 'undefined' && domain.length > 0 && timestamp.length > 0 }
+    { enabled: domain.length > 0 && timestamp.length > 0 }
   );
 
   const state = useMemo<ViewerState>(() => {
@@ -28,7 +29,17 @@ export function useViewer(domain: string, timestamp: string): UseViewerReturn {
     }
 
     if (error) {
-      return { site: domain, timestamp, waybackUrl: "", isLoading: false, error: error.message, era: "" };
+      return {
+        site: domain,
+        timestamp,
+        waybackUrl: "",
+        isLoading: false,
+        error: {
+          code: "ARCHIVE_UNAVAILABLE",
+          retryable: true,
+        },
+        era: "",
+      };
     }
 
     if (result?.success) {
@@ -39,16 +50,19 @@ export function useViewer(domain: string, timestamp: string): UseViewerReturn {
         waybackUrl: getWaybackEmbedUrl(data.url),
         isLoading: false,
         error: null,
-        era: getEra(data.timestamp),
+        era: ERA_DISPLAY[getEra(data.timestamp)] ?? getEra(data.timestamp),
       };
     }
 
+    // result is a failure — propagate the typed AppError
     return {
       site: domain,
       timestamp,
       waybackUrl: "",
       isLoading: false,
-      error: result ? errorMessage(result.error) : "Snapshot not available",
+      error: result
+        ? result.error
+        : { code: "SNAPSHOT_UNAVAILABLE", domain, timestamp },
       era: "",
     };
   }, [result, isLoading, error, domain, timestamp]);

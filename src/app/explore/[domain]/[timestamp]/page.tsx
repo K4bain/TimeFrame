@@ -4,7 +4,6 @@ import { Suspense, useEffect, useMemo, useCallback, useState, useRef } from "rea
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
-  ArrowLeft,
   Loader2,
   AlertCircle,
   ChevronLeft,
@@ -17,6 +16,9 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip } from "@/components/ui/tooltip";
+import { Input } from "@/components/ui/input";
+import { SiteHeader } from "@/components/layout/site-header";
+import { ErrorDisplay } from "@/components/error-states/error-display";
 import { ContextPanel } from "@/components/context/context-panel";
 import { useTimeline } from "@/features/timeline/use-timeline";
 import { useViewer } from "@/features/viewer/use-viewer";
@@ -46,15 +48,14 @@ function EraBand({
   if (width < 2) return null;
 
   const ERA_NAMES: Record<string, string> = {
-    "Early Web": "Early Web",
-    "Dot-com Era": "Dot-Com",
-    "Post Bubble": "Post-Crash",
-    "Web 2.0 Rise": "Web 2.0",
-    "Social Emergence": "Social",
-    "Mobile Shift": "Mobile",
-    "Modern Web": "Modern",
-    "Contemporary": "Platform",
-    "Current Era": "Current",
+    "early-web": "Early Web",
+    "browser-wars": "Browser Wars",
+    "post-crash": "Post-Crash",
+    "web-20": "Web 2.0",
+    "mobile-transition": "Mobile",
+    "flat-design": "Flat Design",
+    "platform-web": "Platform",
+    "ai-transition": "AI Era",
   };
 
   return (
@@ -155,6 +156,8 @@ function ExploreContent() {
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
       function captureDate(ts: string): Date {
         return new Date(
           parseInt(ts.slice(0, 4), 10),
@@ -210,7 +213,7 @@ function ExploreContent() {
           const idx = selectedIndex;
           if (idx < captures.length - 1) {
             const targetYear = parseInt(captures[idx].timestamp.slice(0, 4), 10) + 1;
-            const target = [...captures].reverse().find(
+            const target = captures.find(
               (c) => parseInt(c.timestamp.slice(0, 4), 10) === targetYear
             );
             if (target) router.push(`/explore/${domain}/${target.timestamp}`);
@@ -239,13 +242,19 @@ function ExploreContent() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
+  useEffect(() => {
+    function onFullscreenChange() {
+      setIsFullscreen(!!document.fullscreenElement);
+    }
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", onFullscreenChange);
+  }, []);
+
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {});
-      setIsFullscreen(true);
     } else {
       document.exitFullscreen().catch(() => {});
-      setIsFullscreen(false);
     }
   }, []);
 
@@ -342,37 +351,31 @@ function ExploreContent() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Chrome - COMP.2 */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-bg-surface border-b border-border-subtle">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 h-[52px] flex items-center gap-4">
-          <Link href="/" className="flex items-center gap-2 shrink-0">
-            <span className="font-semibold text-sm">Timeframe</span>
-          </Link>
+      <SiteHeader wordmark innerClassName="max-w-7xl mx-auto px-4 md:px-6">
+        <form onSubmit={handleSearch} className="flex-1 max-w-xs">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-bg-base border border-border-subtle rounded-sm focus-within:border-temporal-border transition-colors">
+            <Search className="w-3.5 h-3.5 text-text-muted shrink-0" aria-hidden="true" />
+            <Input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search a site…"
+              aria-label="Search for a website"
+              size="sm"
+            />
+          </div>
+        </form>
 
-          {/* Search Field - COMP.1 (Chrome configuration) */}
-          <form onSubmit={handleSearch} className="flex-1 max-w-xs">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-bg-base border border-border-subtle rounded-sm focus-within:border-temporal-border transition-colors">
-              <Search className="w-3.5 h-3.5 text-text-muted shrink-0" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search a site…"
-                className="w-full bg-transparent outline-none text-text-primary placeholder:text-text-muted text-sm"
-                aria-label="Search for a website"
-              />
-            </div>
-          </form>
-
-          {captures.length > 0 && (
-            <div className="flex items-center gap-2">
-              <Link
-                href={`/compare/${domain}/${captures[0].timestamp}/${captures[captures.length - 1].timestamp}`}
-              >
-                <Button variant="ghost" size="sm">
-                  <GitCompare className="w-4 h-4 mr-1" />
-                  Compare
-                </Button>
-              </Link>
+        {captures.length > 0 && (
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/compare/${domain}/${captures[0].timestamp}/${captures[captures.length - 1].timestamp}`}
+            >
+              <Button variant="ghost" size="sm">
+                <GitCompare className="w-4 h-4 mr-1" />
+                Compare
+              </Button>
+            </Link>
             <Button
               variant="ghost"
               size="icon"
@@ -415,9 +418,8 @@ function ExploreContent() {
               </Button>
             )}
           </div>
-          )}
-        </div>
-      </div>
+        )}
+      </SiteHeader>
 
       {/* Main Content */}
       <div className="flex-1 flex pt-[52px]">
@@ -439,16 +441,11 @@ function ExploreContent() {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col items-center justify-center py-20"
               >
-                <AlertCircle className="w-12 h-12 text-text-muted mb-4" />
-                <h2 className="text-xl font-semibold mb-2">No timeline available</h2>
-                <p className="text-text-muted text-center max-w-md">{timelineError}</p>
-                <Link href="/">
-                  <Button variant="outline" className="mt-6">
-                    Try another search
-                  </Button>
-                </Link>
+                <ErrorDisplay
+                  error={timelineError}
+                  onAction={() => window.location.reload()}
+                />
               </motion.div>
             )}
 
@@ -460,14 +457,14 @@ function ExploreContent() {
               >
                 {/* Snapshot Metadata Bar - COMP.9 */}
                 {selectedCapture && (
-                  <div className="mb-4 flex items-center gap-3 text-sm">
-                    <span className="font-medium">{domain}</span>
+                  <div className="mb-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <span className="text-display text-xl text-text-primary">{domain}</span>
                     <span className="text-text-muted">/</span>
-                    <span className="font-mono text-temporal-text">
+                    <span className="font-mono text-temporal-text text-sm">
                       {formatDate(selectedCapture.timestamp)}
                     </span>
                     <span className="text-text-muted">/</span>
-                    <span className="text-text-muted">
+                    <span className="text-text-muted text-sm">
                       {selectedIndex + 1} of {captures.length}
                     </span>
                   </div>
@@ -502,12 +499,12 @@ function ExploreContent() {
                         aria-label={`Jump to ${yearData.year}`}
                       >
                         <div
-                          className={`w-full transition-colors duration-150 rounded-t-xs cursor-pointer ${
+                          className={`w-full transition-all duration-150 rounded-t-xs cursor-pointer ${
                             selectedYear === yearData.year
-                              ? "bg-temporal-primary"
-                              : "bg-temporal-primary/20 group-hover:bg-temporal-primary/40"
+                              ? "bg-temporal-primary shadow-temporal"
+                              : "bg-temporal-primary/40 group-hover:bg-temporal-primary/70 group-hover:scale-y-105 origin-bottom"
                           }`}
-                          style={{ height: `${Math.max(yearData.density * 100, 4)}%` }}
+                          style={{ height: `${Math.max(yearData.density * 100, 6)}%` }}
                           title={`${yearData.year}: ${yearData.captures.length} snapshots`}
                         />
                       </button>
@@ -542,6 +539,7 @@ function ExploreContent() {
                     aria-valuemin={0}
                     aria-valuemax={captures.length - 1}
                     aria-valuenow={selectedIndex}
+                    aria-valuetext={selectedCapture ? formatDate(selectedCapture.timestamp) : ""}
                     tabIndex={0}
                   >
                     {/* Change Markers */}
@@ -647,11 +645,12 @@ function ExploreContent() {
 
                         if (viewerState.error) {
                           return (
-                            <div className="absolute inset-0 flex flex-col items-center justify-center px-6">
-                              <AlertCircle className="w-8 h-8 text-text-muted mb-2" />
-                              <p className="text-text-muted text-center text-sm">
-                                {viewerState.error}
-                              </p>
+                            <div className="absolute inset-0">
+                              <ErrorDisplay
+                                error={viewerState.error}
+                                onAction={() => window.location.reload()}
+                                className="h-full justify-center"
+                              />
                             </div>
                           );
                         }
@@ -665,16 +664,10 @@ function ExploreContent() {
             )}
 
             {!timelineLoading && !timelineError && captures.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-20">
-                <AlertCircle className="w-12 h-12 text-text-muted mb-4" />
-                <h2 className="text-xl font-semibold mb-2">No snapshots found</h2>
-                <p className="text-text-muted text-center max-w-md mb-6">
-                  The archive returned no results for this site.
-                </p>
-                <Link href="/">
-                  <Button variant="outline">Try a different site</Button>
-                </Link>
-              </div>
+              <ErrorDisplay
+                error={{ code: "NO_COVERAGE", domain }}
+                onAction={() => router.push("/")}
+              />
             )}
           </div>
         </div>
@@ -705,7 +698,7 @@ export default function ExplorePage() {
     <main className="min-h-screen">
       <Suspense
         fallback={
-          <div className="min-h-screen flex items-center justify-center">
+          <div className="min-h-screen flex items-center justify-center" role="status" aria-label="Loading explore page">
             <Loader2 className="w-8 h-8 text-text-muted animate-spin" />
           </div>
         }

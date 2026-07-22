@@ -17,7 +17,7 @@ export const collections: Collection[] = [
     id: "early-internet",
     title: "Early Internet",
     description: "The web before the dot-com boom — when pages were simple and the future was unwritten.",
-    websites: ["yahoo.com", "amazon.com", "ebay.com"],
+    websites: ["yahoo.com", "netscape.com"],
   },
   {
     id: "browser-wars",

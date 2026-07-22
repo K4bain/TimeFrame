@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { trpc } from "@/lib/api/trpc";
-import { errorMessage, type AppError } from "@/types/errors";
+import { ERA_DISPLAY } from "@/lib/era-display";
+import type { AppError } from "@/types/errors";
 import { getEra, getWaybackEmbedUrl } from "@/utils";
 
 interface SnapshotState {
@@ -8,7 +9,7 @@ interface SnapshotState {
   waybackUrl: string;
   era: string;
   isLoading: boolean;
-  error: string | null;
+  error: AppError | null;
 }
 
 interface CompareState {
@@ -31,14 +32,20 @@ function buildSnapshotState(
     return { timestamp, waybackUrl: "", era: "", isLoading: true, error: null };
   }
   if (error) {
-    return { timestamp, waybackUrl: "", era: "", isLoading: false, error: error.message || "Request failed" };
+    return {
+      timestamp,
+      waybackUrl: "",
+      era: "",
+      isLoading: false,
+      error: { code: "ARCHIVE_UNAVAILABLE", retryable: true },
+    };
   }
   if (result?.success) {
     const data = result.data as { timestamp: string; url: string; isAvailable: boolean };
     return {
       timestamp: data.timestamp,
       waybackUrl: getWaybackEmbedUrl(data.url),
-      era: getEra(data.timestamp),
+      era: ERA_DISPLAY[getEra(data.timestamp)] ?? getEra(data.timestamp),
       isLoading: false,
       error: null,
     };
@@ -48,7 +55,9 @@ function buildSnapshotState(
     waybackUrl: "",
     era: "",
     isLoading: false,
-    error: result ? errorMessage(result.error) : "Snapshot not available",
+    error: result
+      ? result.error
+      : { code: "SNAPSHOT_UNAVAILABLE", domain, timestamp },
   };
 }
 
@@ -59,12 +68,12 @@ export function useCompare(
 ): UseCompareReturn {
   const { data: resultA, isLoading: loadingA, error: errorA } = trpc.archive.getSnapshot.useQuery(
     { domain, timestamp: timestampA },
-    { enabled: typeof window !== 'undefined' && domain.length > 0 && timestampA.length > 0 }
+    { enabled: domain.length > 0 && timestampA.length > 0 }
   );
 
   const { data: resultB, isLoading: loadingB, error: errorB } = trpc.archive.getSnapshot.useQuery(
     { domain, timestamp: timestampB },
-    { enabled: typeof window !== 'undefined' && domain.length > 0 && timestampB.length > 0 }
+    { enabled: domain.length > 0 && timestampB.length > 0 }
   );
 
   const left = useMemo(
