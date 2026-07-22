@@ -11,6 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ErrorDisplay } from "@/components/error-states/error-display";
+import { AuroraBackground } from "@/components/aurora-background";
 import { useNetworkStatus } from "@/hooks/use-network-status";
 import { useSearch } from "@/features/search/use-search";
 import { formatDate, getEra } from "@/utils";
@@ -52,9 +53,11 @@ function SearchContent() {
 
   return (
     <>
+      <AuroraBackground />
+      <div className="relative z-10">
       <SiteHeader backHref="/" backLabel="Back to home" expandChildren>
         <form onSubmit={handleSubmit} className="w-full max-w-md">
-          <div className="flex items-center gap-2 px-4 py-2 bg-paper-surface border border-border-subtle rounded-md focus-within:border-temporal-border transition-colors">
+          <div className="flex items-center gap-2 px-4 py-2 tf-glass rounded-lg focus-within:shadow-glow-amber transition-shadow duration-300">
             <Search className="w-4 h-4 text-text-muted shrink-0" aria-hidden="true" />
             <Input
               type="text"
@@ -112,7 +115,7 @@ function SearchContent() {
                 <span className="text-2xs uppercase tracking-[0.2em] text-temporal-text font-medium">
                   Results
                 </span>
-                <h1 className="text-display text-3xl md:text-4xl text-text-primary mt-3 mb-2">
+                <h1 className="text-display text-4xl md:text-5xl tf-text-gradient mt-3 mb-2">
                   {result.site}
                 </h1>
                 <div className="flex flex-wrap items-center gap-3 text-sm text-text-tertiary">
@@ -179,8 +182,8 @@ function SearchContent() {
 
           {!isLoading && !error && !result && !initialQuery && (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <Search className="w-10 h-10 text-text-muted mb-4" aria-hidden="true" />
-              <h2 className="text-display text-2xl text-text-primary mb-2">Search a website</h2>
+              <Search className="w-10 h-10 text-amber-400/50 mb-4" aria-hidden="true" />
+              <h2 className="text-display text-2xl tf-text-gradient mb-2">Search a website</h2>
               <p className="text-text-tertiary max-w-md">
                 Enter a domain or URL to explore its archive history.
               </p>
@@ -189,7 +192,7 @@ function SearchContent() {
                   <button
                     key={site}
                     onClick={() => router.push(`/search?q=${encodeURIComponent(site)}`)}
-                    className="text-xs font-mono px-2.5 py-1 rounded-full border border-border-subtle bg-bg-surface text-text-tertiary hover:text-temporal-text hover:border-temporal-border transition-colors"
+                    className="text-xs font-mono px-3 py-1.5 rounded-full tf-glass text-text-tertiary hover:text-amber-300 hover:border-glass-border-hover transition-all duration-200"
                   >
                     {site}
                   </button>
@@ -198,6 +201,7 @@ function SearchContent() {
             </div>
           )}
         </div>
+      </div>
       </div>
     </>
   );

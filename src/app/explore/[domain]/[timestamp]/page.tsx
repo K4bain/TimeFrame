@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { SiteHeader } from "@/components/layout/site-header";
+import { AuroraBackground } from "@/components/aurora-background";
 import { ErrorDisplay } from "@/components/error-states/error-display";
 import { ContextPanel } from "@/components/context/context-panel";
 import { useTimeline } from "@/features/timeline/use-timeline";
@@ -349,7 +350,9 @@ function ExploreContent() {
     : 2025;
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="relative min-h-screen flex flex-col">
+      <AuroraBackground />
+      <div className="relative z-10 flex flex-col flex-1">
       {/* Chrome - COMP.2 */}
       <SiteHeader wordmark innerClassName="max-w-7xl mx-auto px-4 md:px-6">
         <form onSubmit={handleSearch} className="flex-1 max-w-xs">

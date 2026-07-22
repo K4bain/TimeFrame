@@ -22,12 +22,7 @@ import {
  *    prefers-reduced-motion)
  *
  * Clicking a milestone jumps to a search for the associated site — so the
- * timeline functions as a discovery surface, not decoration (MOT.1.1).
- *
- * The scrubber is a discrete control (not free-form dragging): interaction
- * happens via milestone dots, matching MOT.3.5 ("no animation during scrub").
- *
- * Spec reference: MOT.1, MOT.2, MOT.3.5, ACC.3.1.
+ * timeline functions as a discovery surface, not decoration.
  */
 export function HistoryScrubber() {
   const router = useRouter();
@@ -37,12 +32,7 @@ export function HistoryScrubber() {
   const yearToPercent = (year: number) =>
     ((year - MILESTONE_RANGE_START) / totalSpan) * 100;
 
-  // Playhead sweep. Animates from start to ~"today" once on mount.
-  // Position stored as a percentage (0-100). Under reduced motion it
-  // jumps directly to its resting position without transition.
-  const [playhead, setPlayhead] = React.useState(
-    reduced ? 100 : 0
-  );
+  const [playhead, setPlayhead] = React.useState(reduced ? 100 : 0);
   const animatingRef = React.useRef<number | null>(null);
 
   React.useEffect(() => {
@@ -50,13 +40,10 @@ export function HistoryScrubber() {
       setPlayhead(100);
       return;
     }
-    // Use rAF to animate the playhead; CSS transitions are off-limits
-    // here because we're driving position imperatively.
     const start = performance.now();
-    const duration = 1600; // single cinematic sweep, ~MOT.1.2 ceiling
+    const duration = 1800;
     const tick = (now: number) => {
       const t = Math.min((now - start) / duration, 1);
-      // ease-out cubic
       const eased = 1 - Math.pow(1 - t, 3);
       setPlayhead(eased * 100);
       if (t < 1) {
@@ -76,23 +63,23 @@ export function HistoryScrubber() {
   return (
     <div className="w-full select-none" aria-label="Web history timeline, 1991 to today">
       {/* Era bands */}
-      <div className="relative h-7 rounded-md overflow-hidden border border-border-subtle bg-bg-surface">
+      <div className="relative h-10 rounded-lg overflow-hidden border border-glass-border bg-bg-surface">
         {eraSegments.map((era) => {
           const left = yearToPercent(era.start);
           const width = yearToPercent(era.end) - left;
           return (
             <div
               key={era.slug}
-              className="absolute top-0 bottom-0 border-r border-bg-base/40 last:border-r-0"
+              className="absolute top-0 bottom-0 border-r border-bg-base/30 last:border-r-0 transition-opacity duration-500 hover:opacity-40"
               style={{
                 left: `${left}%`,
                 width: `${width}%`,
                 backgroundColor: eraColorVar[era.slug],
-                opacity: 0.22,
+                opacity: 0.25,
               }}
             >
               {width > 8 && (
-                <span className="absolute top-1 left-1.5 text-2xs uppercase tracking-wider font-medium text-text-tertiary">
+                <span className="absolute top-1.5 left-2 text-2xs uppercase tracking-wider font-medium text-text-secondary">
                   {era.name}
                 </span>
               )}
@@ -102,16 +89,16 @@ export function HistoryScrubber() {
 
         {/* Playhead */}
         <div
-          className="absolute top-0 bottom-0 w-px bg-temporal-primary shadow-temporal pointer-events-none"
-          style={{ left: `${playhead}%`, opacity: 0.9 }}
+          className="absolute top-0 bottom-0 w-0.5 bg-amber-400 shadow-glow-amber pointer-events-none z-10"
+          style={{ left: `${playhead}%` }}
           aria-hidden="true"
         >
-          <div className="absolute -top-1 -translate-x-1/2 w-2 h-2 rotate-45 bg-temporal-primary" />
+          <div className="absolute -top-1 -translate-x-1/2 w-3 h-3 rotate-45 bg-amber-400 shadow-glow-amber" />
         </div>
       </div>
 
-      {/* Milestone dots + axis */}
-      <div className="relative h-12 mt-1">
+      {/* Milestone dots */}
+      <div className="relative h-16 mt-2">
         {milestones.map((m) => {
           const pct = yearToPercent(m.year);
           return (
@@ -123,11 +110,13 @@ export function HistoryScrubber() {
               <Tooltip content={`${m.year} · ${m.label}`}>
                 <button
                   onClick={() => handleMilestoneClick(m.site)}
-                  className="group flex flex-col items-center pt-1.5"
-                  style={{ marginLeft: "50%" }}
+                  className="group flex flex-col items-center gap-1.5 pt-2"
                   aria-label={`${m.label} (${m.year}) — search ${m.site}`}
                 >
-                  <span className="w-2 h-2 rounded-full bg-temporal-primary/70 group-hover:bg-temporal-primary group-hover:scale-125 transition-transform duration-150" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400/60 group-hover:bg-amber-400 group-hover:scale-150 group-hover:shadow-glow-amber transition-all duration-200" />
+                  <span className="text-2xs font-mono text-text-muted group-hover:text-amber-300 transition-colors whitespace-nowrap">
+                    {m.year}
+                  </span>
                 </button>
               </Tooltip>
             </div>
@@ -135,11 +124,11 @@ export function HistoryScrubber() {
         })}
 
         {/* Year axis */}
-        <div className="absolute bottom-0 left-0 right-0 flex justify-between text-2xs font-mono text-text-muted px-0.5">
+        <div className="absolute bottom-0 left-0 right-0 flex justify-between text-2xs font-mono text-text-muted px-1 pt-3 border-t border-glass-border mt-8">
           <span>{MILESTONE_RANGE_START}</span>
-          <span className="opacity-60">2000</span>
-          <span className="opacity-60">2010</span>
-          <span className="opacity-60">2020</span>
+          <span className="opacity-50">2000</span>
+          <span className="opacity-50">2010</span>
+          <span className="opacity-50">2020</span>
           <span>{MILESTONE_RANGE_END}</span>
         </div>
       </div>

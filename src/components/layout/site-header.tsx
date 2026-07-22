@@ -49,11 +49,11 @@ export function SiteHeader({
   innerClassName = "max-w-7xl mx-auto px-4 md:px-6",
 }: SiteHeaderProps) {
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-bg-base/80 backdrop-blur-sm border-b border-border-subtle">
-      <div className={cn("h-[52px] flex items-center gap-4", innerClassName, className)}>
+    <div className="fixed top-0 left-0 right-0 z-50 tf-glass-strong border-b border-glass-border">
+      <div className={cn("h-[56px] flex items-center gap-4", innerClassName, className)}>
         {wordmark && (
           <Link href="/" className="flex items-center gap-2 shrink-0 group">
-            <span className="text-display text-base tracking-tight text-text-primary group-hover:text-temporal-text transition-colors">
+            <span className="text-display text-base tracking-tight tf-text-gradient group-hover:opacity-80 transition-opacity">
               Timeframe
             </span>
           </Link>
