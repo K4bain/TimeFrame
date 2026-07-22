@@ -2,7 +2,7 @@ export default function RootLoading() {
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div
-        className="tf-skeleton tf-skeleton--shimmer h-8 w-8 rounded-full"
+        className="tf-skeleton tf-skeleton--shimmer h-1 w-32"
         role="status"
         aria-label="Loading"
       />

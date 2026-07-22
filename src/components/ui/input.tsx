@@ -5,17 +5,14 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 /**
- * Input primitive — COMP.1.
+ * Input — transparent text field.
  *
- * Single styled text input used across the chrome (header search, hero
- * search). Replaces the three bespoke inline <input> blocks that had begun
- * to drift apart in padding, focus treatment, and placeholder color.
- *
- * Spec reference: COMP.1, MOT.2 (focus transition = --dur-fast).
+ * Borderless by design; relies on its container to provide the
+ * hairline frame. Focus state surfaces a gold underline.
  */
 
 const inputVariants = cva(
-  "w-full bg-transparent outline-none text-text-primary placeholder:text-text-muted transition-colors",
+  "w-full bg-transparent outline-none text-paper placeholder:text-paper-dim font-mono tabular-nums transition-colors",
   {
     variants: {
       size: {

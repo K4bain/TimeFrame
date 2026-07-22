@@ -4,15 +4,21 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
+/**
+ * Badge — a catalogue tag.
+ *
+ * Sharp corners, hairline border, mono caps text.
+ */
+
 const badgeVariants = cva(
-  "inline-flex items-center rounded-xs border px-2 py-0.5 text-2xs font-medium tracking-wide transition-colors",
+  "inline-flex items-center rounded-none border px-2 py-0.5 text-2xs font-mono tracking-wider uppercase transition-colors",
   {
     variants: {
       variant: {
-        default: "border-border-subtle bg-bg-elevated text-text-tertiary",
-        temporal: "border-temporal-border bg-temporal-bg text-temporal-text",
-        error: "border-error-border bg-error-bg text-error",
-        success: "border-success-border bg-success-bg text-success",
+        default: "border-rule text-paper-faint",
+        temporal: "border-gold/40 text-gold",
+        error: "border-error-border text-error",
+        success: "border-success-border text-success",
       },
     },
     defaultVariants: {

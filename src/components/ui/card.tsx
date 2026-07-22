@@ -2,20 +2,17 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Card primitive — COMP.1.
+ * Card — a framed plate, like a museum-catalogue entry.
  *
- * Surface container for grouped content (collections, search results,
- * compare panels). Uses warm paper tokens so cards read as physical
- * "exhibits" rather than generic UI surfaces.
- *
- * Spec reference: COMP.1, DSYS surface scale.
+ * Sharp corners (no radius), hairline border that warms to gold
+ * on hover. No shadows, no glass, no translucency.
  */
 
 function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
-        "tf-glass rounded-xl text-text-primary transition-all duration-300 hover:border-glass-border-hover",
+        "bg-ink-panel border border-rule text-paper transition-colors duration-300 hover:border-gold/60",
         className
       )}
       {...props}
@@ -35,7 +32,7 @@ function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement
 function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
     <h3
-      className={cn("font-medium leading-tight tracking-tight", className)}
+      className={cn("font-display font-normal text-lg leading-tight tracking-tight", className)}
       {...props}
     />
   );
@@ -44,7 +41,7 @@ function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElem
 function CardDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
     <p
-      className={cn("text-sm text-text-tertiary leading-relaxed", className)}
+      className={cn("text-sm text-paper-faint leading-relaxed", className)}
       {...props}
     />
   );

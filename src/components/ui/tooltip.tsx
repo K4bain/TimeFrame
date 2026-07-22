@@ -51,7 +51,7 @@ export function Tooltip({
         <div
           role="tooltip"
           className={cn(
-            "absolute z-50 px-3 py-2 text-xs text-text-secondary bg-bg-elevated border border-border-subtle rounded-sm shadow-md max-w-[240px] pointer-events-none",
+            "absolute z-50 px-3 py-1.5 text-xs text-paper-soft bg-ink-raised border border-rule rounded-none max-w-[240px] pointer-events-none",
             side === "top" && "bottom-full left-1/2 -translate-x-1/2 mb-2",
             side === "bottom" && "top-full left-1/2 -translate-x-1/2 mt-2"
           )}

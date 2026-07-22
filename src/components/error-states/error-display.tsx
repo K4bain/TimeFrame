@@ -16,17 +16,12 @@ export interface ErrorDisplayProps {
 }
 
 /**
- * ErrorDisplay — renders a zone-scoped error state per COMP.10.
+ * ErrorDisplay — renders a zone-scoped error state.
  *
- * Layout: AlertCircle icon (--icon-lg, --color-error) → title (--text-lg,
- * --color-text-primary) → description (--text-sm, --color-text-secondary)
- * → action button (COMP.13, secondary variant).
- *
- * Errors render within their zone, not as full-page takeovers —
- * unless `fullScreen` is set (reserved for NETWORK_OFFLINE).
- *
- * Spec reference: COMP.10, ERR.3, ERR.4.
+ * Minimal editorial layout: small mono eyebrow, serif headline, body text,
+ * optional action. No icons in editorial mode — type does the work.
  */
+
 export function ErrorDisplay({
   error,
   onAction,
@@ -39,28 +34,28 @@ export function ErrorDisplay({
     <div
       className={cn(
         "flex flex-col items-center text-center",
-        fullScreen ? "min-h-screen justify-center px-6" : "justify-center py-12 px-6",
+        fullScreen ? "min-h-screen justify-center px-6" : "justify-center py-16 px-6",
         className
       )}
       role="alert"
       aria-live="assertive"
     >
       <AlertCircle
-        className="mb-4 h-8 w-8 text-error"
+        className="mb-4 h-7 w-7 text-paper-dim"
         aria-hidden="true"
       />
-      <h2 className="text-lg font-medium text-text-primary">
+      <h2 className="text-lg font-display text-paper">
         {config.title}
       </h2>
-      <p className="mt-2 max-w-sm text-sm text-text-secondary">
+      <p className="mt-2 max-w-sm text-sm text-paper-faint">
         {config.description}
       </p>
       {config.actionLabel && onAction && (
         <Button
-          variant="secondary"
+          variant="outline"
           size="sm"
           onClick={onAction}
-          className="mt-6"
+          className="mt-8"
         >
           {config.actionLabel === "Reload page" && (
             <RotateCcw className="h-4 w-4" aria-hidden="true" />
@@ -70,10 +65,10 @@ export function ErrorDisplay({
       )}
       {config.actionLabel === "Reload page" && !onAction && (
         <Button
-          variant="secondary"
+          variant="outline"
           size="sm"
           onClick={() => window.location.reload()}
-          className="mt-6"
+          className="mt-8"
         >
           <RotateCcw className="h-4 w-4" aria-hidden="true" />
           Reload page

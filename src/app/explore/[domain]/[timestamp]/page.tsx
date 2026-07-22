@@ -18,7 +18,6 @@ import { Button } from "@/components/ui/button";
 import { Tooltip } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { SiteHeader } from "@/components/layout/site-header";
-import { AuroraBackground } from "@/components/aurora-background";
 import { ErrorDisplay } from "@/components/error-states/error-display";
 import { ContextPanel } from "@/components/context/context-panel";
 import { useTimeline } from "@/features/timeline/use-timeline";
@@ -61,11 +60,16 @@ function EraBand({
 
   return (
     <div
-      className="absolute top-0 bottom-0 bg-temporal-bg opacity-60 pointer-events-none"
-      style={{ left: `${left}%`, width: `${width}%` }}
+      className="absolute top-0 bottom-0 pointer-events-none"
+      style={{
+        left: `${left}%`,
+        width: `${width}%`,
+        backgroundColor: "var(--color-gold-faint)",
+        borderLeft: "1px solid var(--color-rule)",
+      }}
     >
       {width > 8 && (
-        <span className="absolute top-1 left-1 text-2xs uppercase tracking-wider text-temporal-text/50 font-medium">
+        <span className="absolute top-1 left-1.5 text-2xs font-mono uppercase tracking-wider text-paper-dim">
           {ERA_NAMES[era] || era}
         </span>
       )}
@@ -102,11 +106,11 @@ function ChangeMarker({
         aria-label={`Change detected: ${formatDate(timestamp)}. Click to navigate.`}
       >
         <div
-          className="bg-temporal-primary rotate-45"
+          className="bg-gold rotate-45"
           style={{ width: `${diamond}px`, height: `${diamond}px` }}
         />
         <div
-          className="w-px bg-temporal-primary"
+          className="w-px bg-gold/60"
           style={{ height: `${height}px` }}
         />
       </button>
@@ -351,18 +355,15 @@ function ExploreContent() {
 
   return (
     <div className="relative min-h-screen flex flex-col">
-      <AuroraBackground />
-      <div className="relative z-10 flex flex-col flex-1">
-      {/* Chrome - COMP.2 */}
       <SiteHeader wordmark innerClassName="max-w-7xl mx-auto px-4 md:px-6">
         <form onSubmit={handleSearch} className="flex-1 max-w-xs">
-          <div className="flex items-center gap-2 px-3 py-1.5 tf-glass rounded-lg focus-within:shadow-glow-amber transition-shadow duration-300">
-            <Search className="w-3.5 h-3.5 text-text-muted shrink-0" aria-hidden="true" />
+          <div className="group flex items-center gap-2 border-b border-rule focus-within:border-gold transition-colors duration-300 pb-1">
+            <Search className="w-3.5 h-3.5 text-paper-dim shrink-0 group-focus-within:text-gold transition-colors" aria-hidden="true" />
             <Input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search a site…"
+              placeholder="search a site"
               aria-label="Search for a website"
               size="sm"
             />
@@ -424,19 +425,18 @@ function ExploreContent() {
         )}
       </SiteHeader>
 
-      {/* Main Content */}
-      <div className="flex-1 flex pt-[52px]">
+      <div className="flex-1 flex pt-[56px]">
         {/* Left: Timeline + Viewer */}
-        <div className="flex-1 min-w-0 px-4 md:px-6 py-6">
+        <div className="flex-1 min-w-0 px-6 md:px-10 py-8">
           <div className="max-w-5xl mx-auto">
             {timelineLoading && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="flex flex-col items-center justify-center py-20"
+                className="flex flex-col items-center justify-center py-24"
               >
-                <Loader2 className="w-8 h-8 text-text-muted animate-spin mb-4" />
-                <p className="text-text-muted">Loading timeline...</p>
+                <Loader2 className="w-6 h-6 text-paper-dim animate-spin mb-4" />
+                <p className="text-colophon">Loading timeline</p>
               </motion.div>
             )}
 
@@ -454,28 +454,27 @@ function ExploreContent() {
 
             {!timelineLoading && !timelineError && captures.length > 0 && (
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
               >
-                {/* Snapshot Metadata Bar - COMP.9 */}
+                {/* Metadata bar */}
                 {selectedCapture && (
-                  <div className="mb-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                    <span className="text-display text-xl text-text-primary">{domain}</span>
-                    <span className="text-text-muted">/</span>
-                    <span className="font-mono text-amber-300 text-sm">
+                  <div className="mb-8 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <span className="text-display text-2xl text-paper">{domain}</span>
+                    <span className="text-paper-dim">/</span>
+                    <span className="font-mono text-gold text-sm">
                       {formatDate(selectedCapture.timestamp)}
                     </span>
-                    <span className="text-text-muted">/</span>
-                    <span className="text-text-muted text-sm">
+                    <span className="text-paper-dim">/</span>
+                    <span className="text-paper-faint text-sm font-mono">
                       {selectedIndex + 1} of {captures.length}
                     </span>
                   </div>
                 )}
 
-                {/* Timeline with Era Bands - COMP.3 + COMP.8 */}
-                <div className="mb-6">
-                  {/* Era Bands */}
+                {/* Timeline with Era Bands */}
+                <div className="mb-8">
                   <div className="relative h-6 mb-1">
                     {eras.map(({ era, start, end }) => (
                       <EraBand
@@ -502,10 +501,10 @@ function ExploreContent() {
                         aria-label={`Jump to ${yearData.year}`}
                       >
                         <div
-                          className={`w-full transition-all duration-150 rounded-t-xs cursor-pointer ${
+                          className={`w-full transition-colors duration-150 cursor-pointer ${
                             selectedYear === yearData.year
-                              ? "bg-temporal-primary shadow-temporal"
-                              : "bg-temporal-primary/40 group-hover:bg-temporal-primary/70 group-hover:scale-y-105 origin-bottom"
+                              ? "bg-gold"
+                              : "bg-gold/25 group-hover:bg-gold/50"
                           }`}
                           style={{ height: `${Math.max(yearData.density * 100, 6)}%` }}
                           title={`${yearData.year}: ${yearData.captures.length} snapshots`}
@@ -519,8 +518,8 @@ function ExploreContent() {
                         key={yearData.year}
                         className={`flex-1 text-center text-xs font-mono ${
                           selectedYear === yearData.year
-                            ? "text-temporal-text font-medium"
-                            : "text-text-muted"
+                            ? "text-gold font-medium"
+                            : "text-paper-dim"
                         }`}
                       >
                         {yearData.year % 5 === 0 ||
@@ -533,10 +532,10 @@ function ExploreContent() {
                   </div>
                 </div>
 
-                {/* Scrubber with Change Markers - COMP.3 + COMP.7 */}
-                <div className="mb-6">
+                {/* Scrubber with Change Markers */}
+                <div className="mb-8">
                   <div
-                    className="relative h-12 bg-bg-surface rounded-md overflow-hidden"
+                    className="relative h-12 bg-ink-panel border border-rule overflow-hidden"
                     role="slider"
                     aria-label="Timeline scrubber"
                     aria-valuemin={0}
@@ -545,7 +544,6 @@ function ExploreContent() {
                     aria-valuetext={selectedCapture ? formatDate(selectedCapture.timestamp) : ""}
                     tabIndex={0}
                   >
-                    {/* Change Markers */}
                     {changeScores.map(({ index, score, timestamp }) => (
                       <ChangeMarker
                         key={timestamp}
@@ -557,7 +555,6 @@ function ExploreContent() {
                       />
                     ))}
 
-                    {/* Snapshot Dots */}
                     <div className="absolute inset-0 flex items-center">
                       {sampledDots.map((capture) => {
                         const realIndex = captures.findIndex(
@@ -576,7 +573,7 @@ function ExploreContent() {
                           >
                             {hasGap && (
                               <div
-                                className="absolute -left-1 w-3 h-full bg-temporal-primary/20 rounded-sm"
+                                className="absolute -left-1 w-3 h-full bg-gold/10"
                                 title="Coverage gap"
                               />
                             )}
@@ -584,10 +581,10 @@ function ExploreContent() {
                               onClick={() =>
                                 router.push(`/explore/${domain}/${capture.timestamp}`)
                               }
-                              className={`w-2 h-2 rounded-full transition-all duration-150 ${
+                              className={`w-1.5 h-1.5 rounded-full transition-colors duration-150 ${
                                 selectedCapture?.timestamp === capture.timestamp
-                                  ? "bg-temporal-primary scale-150 shadow-temporal"
-                                  : "bg-text-muted/50 hover:bg-temporal-hover hover:scale-125"
+                                  ? "bg-gold scale-150"
+                                  : "bg-paper-dim/50 hover:bg-gold hover:scale-125"
                               }`}
                               aria-label={`Select snapshot from ${formatDate(capture.timestamp)}`}
                             />
@@ -596,29 +593,29 @@ function ExploreContent() {
                       })}
                     </div>
                   </div>
-                  <p className="text-xs text-text-muted mt-2 text-center">
+                  <p className="text-colophon text-center mt-3">
                     Use ← → arrow keys to navigate
                   </p>
                 </div>
 
-                  {/* Viewer - COMP.4 */}
+                {/* Viewer */}
                 {selectedCapture && (
                   <motion.div
                     key={selectedCapture.timestamp}
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="bg-bg-surface border border-border-default rounded-md overflow-hidden"
+                    className="border border-rule bg-ink-panel overflow-hidden"
                   >
-                    <div className="aspect-video relative bg-bg-base">
+                    <div className="aspect-video relative bg-ink-void">
                       {(() => {
                         const showUrl = viewerState.waybackUrl || lastWaybackUrl.current;
 
                         if (viewerState.isLoading && !showUrl) {
                           return (
                             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                              <Loader2 className="w-8 h-8 text-text-muted animate-spin mb-4" />
-                              <p className="text-text-muted">Loading snapshot...</p>
+                              <Loader2 className="w-6 h-6 text-paper-dim animate-spin mb-4" />
+                              <p className="text-colophon">Loading snapshot</p>
                             </div>
                           );
                         }
@@ -628,14 +625,14 @@ function ExploreContent() {
                             <>
                               {isIframeLoading && (
                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                  <Loader2 className="w-8 h-8 text-text-muted animate-spin mb-4" />
-                                  <p className="text-text-muted">Rendering snapshot...</p>
+                                  <Loader2 className="w-6 h-6 text-paper-dim animate-spin mb-4" />
+                                  <p className="text-colophon">Rendering snapshot</p>
                                 </div>
                               )}
                               <div className={`h-full transition-opacity duration-300 ${isIframeLoading ? 'opacity-0' : 'opacity-100'}`}>
                                 <iframe
                                   src={showUrl}
-                                  className="w-full h-full border-0 bg-bg-base"
+                                  className="w-full h-full border-0 bg-ink-void"
                                   title={`Archived version of ${domain} from ${formatDate(selectedCapture.timestamp)}`}
                                   sandbox="allow-scripts allow-same-origin"
                                   referrerPolicy="no-referrer"
@@ -675,8 +672,8 @@ function ExploreContent() {
           </div>
         </div>
 
-        {/* Right: Context Panel - COMP.5 */}
-        <div className="hidden lg:block w-72 border-l border-border-subtle bg-bg-base">
+        {/* Right: Context Panel */}
+        <div className="hidden lg:block w-72 border-l border-rule bg-ink-void">
           <ContextPanel
             domain={domain}
             captures={captures}
@@ -692,7 +689,6 @@ function ExploreContent() {
           />
         </div>
       </div>
-      </div>
     </div>
   );
 }
@@ -703,7 +699,7 @@ export default function ExplorePage() {
       <Suspense
         fallback={
           <div className="min-h-screen flex items-center justify-center" role="status" aria-label="Loading explore page">
-            <Loader2 className="w-8 h-8 text-text-muted animate-spin" />
+            <Loader2 className="w-6 h-6 text-paper-dim animate-spin" />
           </div>
         }
       >

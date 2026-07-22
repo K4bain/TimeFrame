@@ -4,136 +4,76 @@
 @theme {
   /* ─── Typography ──────────────────────────────────────── */
   --font-sans: var(--font-geist), system-ui, -apple-system, sans-serif;
-  --font-display: var(--font-space-grotesk), var(--font-geist), system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
   --font-serif: var(--font-fraunces), Georgia, "Times New Roman", serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "Cascadia Code", monospace;
 
-  /* ─── Backgrounds (warm-leaning near-black) ───────────── */
-  --color-bg-base: #0a0a0f;
-  --color-bg-surface: #111118;
-  --color-bg-elevated: #181822;
-  --color-bg-input: #14141c;
-  --color-bg-hover: #22222e;
-  --color-bg-selected: #2a2a38;
-  --color-bg-disabled: #14141c;
+  /* ─── Ink (dark ground — the default mode) ────────────── */
+  --color-ink-void: #0d0c0a;        /* page background */
+  --color-ink-panel: #16140f;       /* panel / card surface */
+  --color-ink-raised: #1f1c16;      /* elevated surface */
+  --color-ink-deep: #07060500;      /* unused placeholder for parity */
 
-  /* ─── Glass surfaces (translucent, for layering over aurora) ─ */
-  --color-glass-bg: rgba(255, 255, 255, 0.03);
-  --color-glass-bg-strong: rgba(255, 255, 255, 0.06);
-  --color-glass-border: rgba(255, 255, 255, 0.08);
-  --color-glass-border-hover: rgba(255, 255, 255, 0.14);
+  /* ─── Paper (text on ink) ─────────────────────────────── */
+  --color-paper: #ede7da;           /* primary text */
+  --color-paper-soft: #b8b0a0;      /* secondary text */
+  --color-paper-faint: #807a6e;     /* muted / meta */
+  --color-paper-dim: #56514a;       /* dimmest text */
 
-  /* ─── Borders ─────────────────────────────────────────── */
-  --color-border-subtle: #1e1e2a;
-  --color-border-default: #2a2a3a;
-  --color-border-strong: #3a3a50;
-  --color-border-focus: #f59e0b;
-  --color-border-focus-neutral: #c4c4ce;
+  /* ─── Hairlines ───────────────────────────────────────── */
+  --color-rule: #2a2620;            /* standard hairline */
+  --color-rule-bright: #3a352c;     /* brighter hairline on hover */
+  --color-rule-gold: #4a3a1e;       /* gold-tinted hairline */
 
-  /* ─── Text ────────────────────────────────────────────── */
-  --color-text-primary: #f4f4f7;
-  --color-text-secondary: #c8c8d4;
-  --color-text-tertiary: #8a8a9a;
-  --color-text-muted: #5a5a6e;
-  --color-text-disabled: #3a3a4a;
-  --color-text-inverse: #0a0a0f;
-  --color-text-link: #22d3ee;
-  --color-text-link-hover: #67e8f9;
+  /* ─── Gold (the single accent) ────────────────────────── */
+  --color-gold: #c89545;            /* primary accent on dark */
+  --color-gold-bright: #d9a65a;     /* hover */
+  --color-gold-deep: #a8742a;       /* active / pressed */
+  --color-gold-faint: rgba(200, 149, 69, 0.12); /* tint backgrounds */
 
-  /* ─── Amber / Gold (primary accent — the "time travel" hue) ── */
-  --color-amber-50:  #fffbeb;
-  --color-amber-100: #fef3c7;
-  --color-amber-200: #fde68a;
-  --color-amber-300: #fcd34d;
-  --color-amber-400: #fbbf24;
-  --color-amber-500: #f59e0b;
-  --color-amber-600: #d97706;
-  --color-amber-700: #b45309;
+  /* ─── Status (muted, in keeping with the palette) ─────── */
+  --color-error: #c47168;
+  --color-error-bg: rgba(196, 113, 104, 0.08);
+  --color-error-border: rgba(196, 113, 104, 0.25);
+  --color-success: #8fa86a;
+  --color-success-bg: rgba(143, 168, 106, 0.08);
+  --color-success-border: rgba(143, 168, 106, 0.25);
 
-  /* ─── Cyan (secondary accent — the "digital" hue) ─────── */
-  --color-cyan-300: #67e8f9;
-  --color-cyan-400: #22d3ee;
-  --color-cyan-500: #06b6d4;
-  --color-cyan-600: #0891b2;
-
-  /* ─── Temporal (legacy compat — maps to amber) ────────── */
-  --color-temporal-primary: #f59e0b;
-  --color-temporal-hover: #fbbf24;
-  --color-temporal-subtle: #fcd34d;
-  --color-temporal-dark: #d97706;
-  --color-temporal-text: #fbbf24;
-  --color-temporal-border: #d97706;
-  --color-temporal-bg: rgba(245, 158, 11, 0.1);
-
-  /* ─── Status ──────────────────────────────────────────── */
-  --color-error: #f87171;
-  --color-error-bg: rgba(248, 113, 113, 0.1);
-  --color-error-border: rgba(248, 113, 113, 0.3);
-  --color-success: #34d399;
-  --color-success-bg: rgba(52, 211, 153, 0.1);
-  --color-success-border: rgba(52, 211, 153, 0.3);
-  --color-info: #22d3ee;
-  --color-info-bg: rgba(34, 211, 238, 0.1);
-
-  /* ─── Legacy aliases (compat with existing components) ── */
-  --color-background: #0a0a0f;
-  --color-foreground: #f4f4f7;
-  --color-muted: #5a5a6e;
-  --color-border: #2a2a3a;
-  --color-accent: #f59e0b;
-  --color-accent-hover: #fbbf24;
-  --color-surface: #111118;
-  --color-card: #111118;
-  --color-card-foreground: #f4f4f7;
-  --color-popover: #181822;
-  --color-popover-foreground: #f4f4f7;
-  --color-primary: #f59e0b;
-  --color-primary-foreground: #0a0a0f;
-  --color-secondary: #181822;
-  --color-secondary-foreground: #f4f4f7;
-  --color-destructive: #f87171;
-  --color-destructive-foreground: #f4f4f7;
-  --color-ring: #f59e0b;
-  --color-input: #2a2a3a;
-
-  /* ─── Era tints ───────────────────────────────────────── */
+  /* ─── Era tints (warm earth tones — museum vitrine glass) */
   --color-era-early-web: #6b5a3b;
   --color-era-browser-wars: #8a6b3a;
   --color-era-post-crash: #7a4a33;
   --color-era-web-20: #b87333;
   --color-era-mobile-transition: #c2884a;
   --color-era-flat-design: #a8762e;
-  --color-era-platform-web: #f59e0b;
-  --color-era-ai-transition: #22d3ee;
+  --color-era-platform-web: #c89545;
+  --color-era-ai-transition: #7a8a6a;
 
-  /* ─── Radius ──────────────────────────────────────────── */
-  --radius-xs: 3px;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
-  --radius-2xl: 28px;
+  /* ─── Radius (sharp — catalogue frames have no curve) ─── */
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
   --radius-full: 9999px;
 
-  /* ─── Shadows ─────────────────────────────────────────── */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.6);
-  --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.7);
-  --shadow-glow-amber: 0 0 40px rgba(245, 158, 11, 0.15);
-  --shadow-glow-cyan: 0 0 40px rgba(34, 211, 238, 0.12);
-  --shadow-temporal: 0 0 0 1px rgba(245, 158, 11, 0.4), 0 0 20px rgba(245, 158, 11, 0.25);
+  /* ─── Shadows (flat — depth from hairlines, not blur) ─── */
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-xl: none;
 
   --text-2xs: 0.625rem;
 
-  /* ─── Motion ──────────────────────────────────────────── */
+  /* ─── Motion (quiet, considered) ──────────────────────── */
   --dur-instant: 0ms;
-  --dur-fast: 80ms;
-  --dur-quick: 150ms;
-  --dur-normal: 220ms;
-  --dur-moderate: 320ms;
-  --dur-slow: 450ms;
-  --dur-deliberate: 600ms;
+  --dur-fast: 100ms;
+  --dur-quick: 160ms;
+  --dur-normal: 240ms;
+  --dur-moderate: 360ms;
+  --dur-slow: 480ms;
+  --dur-deliberate: 640ms;
   --dur-cinematic: 900ms;
 
   --ease-linear: linear;
@@ -144,12 +84,99 @@
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
 
-  /* ─── Animations ──────────────────────────────────────── */
-  --animate-aurora-drift: aurora-drift 20s ease-in-out infinite;
-  --animate-aurora-drift-slow: aurora-drift 32s ease-in-out infinite;
-  --animate-shimmer: shimmer 2.5s linear infinite;
-  --animate-float: float 6s ease-in-out infinite;
-  --animate-pulse-glow: pulse-glow 3s ease-in-out infinite;
+  /* ─── Background / surface aliases (legacy compat) ────── */
+  --color-bg-base: var(--color-ink-void);
+  --color-bg-surface: var(--color-ink-panel);
+  --color-bg-elevated: var(--color-ink-raised);
+  --color-bg-input: var(--color-ink-void);
+  --color-bg-hover: var(--color-ink-raised);
+  --color-bg-selected: #2a2620;
+  --color-bg-disabled: var(--color-ink-panel);
+
+  /* ─── Glass (remapped to opaque surfaces — no blur) ───── */
+  --color-glass-bg: var(--color-ink-panel);
+  --color-glass-bg-strong: var(--color-ink-raised);
+  --color-glass-border: var(--color-rule);
+  --color-glass-border-hover: var(--color-rule-bright);
+
+  /* ─── Borders ─────────────────────────────────────────── */
+  --color-border-subtle: var(--color-rule);
+  --color-border-default: var(--color-rule-bright);
+  --color-border-strong: #4a4438;
+  --color-border-focus: var(--color-gold);
+  --color-border-focus-neutral: var(--color-paper-faint);
+
+  /* ─── Text ────────────────────────────────────────────── */
+  --color-text-primary: var(--color-paper);
+  --color-text-secondary: var(--color-paper-soft);
+  --color-text-tertiary: var(--color-paper-faint);
+  --color-text-muted: var(--color-paper-dim);
+  --color-text-disabled: #3a352c;
+  --color-text-inverse: var(--color-ink-void);
+  --color-text-link: var(--color-gold);
+  --color-text-link-hover: var(--color-gold-bright);
+
+  /* ─── Amber / Gold scales ─────────────────────────────── */
+  --color-amber-50:  #fdf6e9;
+  --color-amber-100: #f5e6c8;
+  --color-amber-200: #ecd49b;
+  --color-amber-300: #d9a65a;
+  --color-amber-400: #c89545;
+  --color-amber-500: #a8742a;
+  --color-amber-600: #8a5e1e;
+  --color-amber-700: #6b4818;
+
+  /* ─── Cyan scale (kept for parity, rarely used) ───────── */
+  --color-cyan-300: #8aa3a8;
+  --color-cyan-400: #6e8c92;
+  --color-cyan-500: #557580;
+  --color-cyan-600: #3f5a66;
+
+  /* ─── Temporal (legacy compat — remapped to gold) ─────── */
+  --color-temporal-primary: var(--color-gold);
+  --color-temporal-hover: var(--color-gold-bright);
+  --color-temporal-subtle: var(--color-gold-bright);
+  --color-temporal-dark: var(--color-gold-deep);
+  --color-temporal-text: var(--color-gold);
+  --color-temporal-border: var(--color-gold-deep);
+  --color-temporal-bg: var(--color-gold-faint);
+
+  /* ─── Status aliases ──────────────────────────────────── */
+  --color-info: var(--color-gold);
+  --color-info-bg: var(--color-gold-faint);
+
+  /* ─── Legacy aliases ──────────────────────────────────── */
+  --color-background: var(--color-ink-void);
+  --color-foreground: var(--color-paper);
+  --color-muted: var(--color-paper-dim);
+  --color-border: var(--color-rule);
+  --color-accent: var(--color-gold);
+  --color-accent-hover: var(--color-gold-bright);
+  --color-surface: var(--color-ink-panel);
+  --color-card: var(--color-ink-panel);
+  --color-card-foreground: var(--color-paper);
+  --color-popover: var(--color-ink-raised);
+  --color-popover-foreground: var(--color-paper);
+  --color-primary: var(--color-gold);
+  --color-primary-foreground: var(--color-ink-void);
+  --color-secondary: var(--color-ink-panel);
+  --color-secondary-foreground: var(--color-paper);
+  --color-destructive: var(--color-error);
+  --color-destructive-foreground: var(--color-paper);
+  --color-ring: var(--color-gold);
+  --color-input: var(--color-rule);
+
+  /* ─── Shadow aliases (kept for compat — no-op) ────────── */
+  --shadow-glow-amber: none;
+  --shadow-glow-cyan: none;
+  --shadow-temporal: inset 0 -1px 0 var(--color-gold);
+
+  /* ─── Animation tokens (kept for compat — minimal) ────── */
+  --animate-shimmer: tf-shimmer 1.6s linear infinite;
+  --animate-aurora-drift: none;
+  --animate-aurora-drift-slow: none;
+  --animate-float: none;
+  --animate-pulse-glow: none;
 }
 
 /* ─── Base ──────────────────────────────────────────────── */
@@ -159,177 +186,133 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--color-bg-base);
-  color: var(--color-foreground);
+  background-color: var(--color-ink-void);
+  color: var(--color-paper);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  font-feature-settings: "kern", "liga", "calt";
 }
 
-/* ─── Aurora background (the living atmospheric layer) ──── */
-.tf-aurora {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.tf-aurora::before,
-.tf-aurora::after {
-  content: "";
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.5;
-  will-change: transform;
-}
-
-.tf-aurora::before {
-  width: 60vw;
-  height: 60vw;
-  top: -20%;
-  left: -10%;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.35) 0%, transparent 60%);
-  animation: var(--animate-aurora-drift);
-}
-
-.tf-aurora::after {
-  width: 50vw;
-  height: 50vw;
-  bottom: -15%;
-  right: -10%;
-  background: radial-gradient(circle, rgba(34, 211, 238, 0.22) 0%, transparent 60%);
-  animation: var(--animate-aurora-drift-slow);
-  animation-delay: -8s;
-}
-
-@keyframes aurora-drift {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(8%, 6%) scale(1.1); }
-  66% { transform: translate(-6%, 4%) scale(0.95); }
-}
-
-/* ─── Film grain overlay ────────────────────────────────── */
-.tf-grain::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.04;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-  background-size: 200px 200px;
-}
-
-/* ─── Glass surface ─────────────────────────────────────── */
-.tf-glass {
-  background: var(--color-glass-bg);
-  backdrop-filter: blur(16px) saturate(160%);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
-  border: 1px solid var(--color-glass-border);
-}
-
-.tf-glass-strong {
-  background: var(--color-glass-bg-strong);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid var(--color-glass-border);
-}
-
-/* ─── Gradient text ─────────────────────────────────────── */
-.tf-text-gradient {
-  background: linear-gradient(135deg, #fde68a 0%, #f59e0b 40%, #d97706 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-}
-
-.tf-text-gradient-cool {
-  background: linear-gradient(135deg, #67e8f9 0%, #22d3ee 50%, #0891b2 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-}
-
-.tf-text-gradient-split {
-  background: linear-gradient(110deg, #f59e0b 0%, #f59e0b 48%, #22d3ee 52%, #22d3ee 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-}
-
-/* ─── Glow utilities ────────────────────────────────────── */
-.tf-glow-amber {
-  box-shadow: var(--shadow-glow-amber);
-}
-
-.tf-glow-cyan {
-  box-shadow: var(--shadow-glow-cyan);
-}
-
-/* ─── Display type ──────────────────────────────────────── */
+/* ─── Display type (serif — the signature) ──────────────── */
 .text-display {
   font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  font-variation-settings: "opsz" 144, "SOFT" 0, "WONK" 0;
 }
 
 .text-display-serif {
   font-family: var(--font-serif);
-  font-weight: 500;
-  letter-spacing: -0.025em;
-  font-variation-settings: "opsz" 144, "SOFT" 50;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+  font-variation-settings: "opsz" 144, "SOFT" 0;
 }
 
-/* ─── Shimmer (for loading + decorative) ────────────────── */
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+/* ─── Editorial meta / colophon type ────────────────────── */
+.text-colophon {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-paper-faint);
+}
+
+.text-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+}
+
+/* ─── Compatibility classes (remapped, no visual gimmick) ─ */
+.tf-glass,
+.tf-glass-strong {
+  background: var(--color-ink-panel);
+  border: 1px solid var(--color-rule);
+}
+
+.tf-text-gradient,
+.tf-text-gradient-cool,
+.tf-text-gradient-split {
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  color: var(--color-paper);
+}
+
+.tf-glow-amber,
+.tf-glow-cyan {
+  box-shadow: none;
+}
+
+.tf-grain::after {
+  content: none;
+}
+
+.tf-aurora {
+  display: none;
 }
 
 .tf-shimmer {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(245, 158, 11, 0.08) 50%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  animation: var(--animate-shimmer);
+  background: none;
 }
 
-/* ─── Float ─────────────────────────────────────────────── */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-/* ─── Pulse glow ────────────────────────────────────────── */
-@keyframes pulse-glow {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
-}
-
-/* ─── Skeleton ──────────────────────────────────────────── */
+/* ─── Skeleton (functional loading only) ────────────────── */
 .tf-skeleton {
-  background-color: var(--color-bg-elevated);
+  background-color: var(--color-ink-panel);
 }
 
 .tf-skeleton--shimmer {
   background: linear-gradient(
     90deg,
-    var(--color-bg-elevated) 0%,
-    var(--color-bg-hover) 50%,
-    var(--color-bg-elevated) 100%
+    var(--color-ink-panel) 0%,
+    var(--color-ink-raised) 50%,
+    var(--color-ink-panel) 100%
   );
   background-size: 200% 100%;
-  animation: shimmer 1400ms linear infinite;
-  animation-delay: 1000ms;
+  animation: tf-shimmer 1.6s linear infinite;
+  animation-delay: 800ms;
+}
+
+@keyframes tf-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ─── Pulse glow (compat — subtle opacity for status dots) */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* ─── Float (compat — disabled) ─────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(0); }
+}
+
+/* ─── Selection ─────────────────────────────────────────── */
+::selection {
+  background: var(--color-gold-faint);
+  color: var(--color-gold-bright);
+}
+
+/* ─── Scrollbar (subtle, in-keeping) ────────────────────── */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-ink-void);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-rule);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-rule-bright);
 }
 
 /* ─── Reduced motion ────────────────────────────────────── */

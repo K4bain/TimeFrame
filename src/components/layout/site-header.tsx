@@ -7,23 +7,12 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 /**
- * SiteHeader — COMP.2 (shared chrome).
+ * SiteHeader — shared chrome.
  *
- * One fixed top bar used by every secondary route (search, explore,
- * compare, collections). Replaces the four bespoke fixed headers that
- * had drifted apart in height, padding, and back-button styling.
- *
- * Slots:
- *  - `wordmark`            show serif "Timeframe" wordmark on the left
- *  - `backHref`            render a back button targeting this URL
- *  - `backLabel`           accessible label for the back button
- *  - `title`               inline title beside the back button
- *  - `subtitle`            smaller text beneath the title
- *  - `children`            right-side or fill content (forms, actions)
- *  - `expandChildren`      stretch children to fill horizontal space
- *
- * Spec reference: COMP.2, MOT.2 (backdrop blur is static, not animated).
+ * A fixed top bar with a single hairline at its base. Serif wordmark,
+ * text-link back button. No glass, no blur.
  */
+
 export interface SiteHeaderProps {
   wordmark?: boolean;
   backHref?: string;
@@ -33,7 +22,7 @@ export interface SiteHeaderProps {
   children?: React.ReactNode;
   expandChildren?: boolean;
   className?: string;
-  /** Max-width container class. Defaults to the widest chrome layout. */
+  /** Max-width container class. */
   innerClassName?: string;
 }
 
@@ -49,13 +38,14 @@ export function SiteHeader({
   innerClassName = "max-w-7xl mx-auto px-4 md:px-6",
 }: SiteHeaderProps) {
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 tf-glass-strong border-b border-glass-border">
+    <div className="fixed top-0 left-0 right-0 z-50 bg-ink-void/95 backdrop-blur-[2px] border-b border-rule">
       <div className={cn("h-[56px] flex items-center gap-4", innerClassName, className)}>
         {wordmark && (
-          <Link href="/" className="flex items-center gap-2 shrink-0 group">
-            <span className="text-display text-base tracking-tight tf-text-gradient group-hover:opacity-80 transition-opacity">
+          <Link href="/" className="flex items-baseline gap-2 shrink-0 group">
+            <span className="font-display text-lg tracking-tight text-paper group-hover:text-gold transition-colors">
               Timeframe
             </span>
+            <span className="text-colophon hidden sm:inline">No. 0001</span>
           </Link>
         )}
 
@@ -70,10 +60,10 @@ export function SiteHeader({
         {(title || subtitle) && (
           <div className="min-w-0">
             {title && (
-              <div className="text-sm font-medium text-text-primary truncate">{title}</div>
+              <div className="text-sm font-medium text-paper truncate">{title}</div>
             )}
             {subtitle && (
-              <div className="text-xs text-text-tertiary truncate">{subtitle}</div>
+              <div className="text-xs text-paper-faint font-mono truncate">{subtitle}</div>
             )}
           </div>
         )}

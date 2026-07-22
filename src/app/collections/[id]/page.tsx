@@ -5,9 +5,7 @@ import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { SiteHeader } from "@/components/layout/site-header";
-import { AuroraBackground } from "@/components/aurora-background";
 import { getCollection } from "@/features/collections/data";
 import { formatDate } from "@/utils";
 import Link from "next/link";
@@ -77,97 +75,92 @@ export default function CollectionDetailPage() {
 
   return (
     <main className="min-h-screen">
-      <AuroraBackground />
-      <div className="relative z-10">
-        <SiteHeader
-          backHref="/collections"
-          backLabel="Back to collections"
-          title={collection?.title || "Collection"}
-        />
+      <SiteHeader
+        backHref="/collections"
+        backLabel="Back to collections"
+        title={collection?.title || "Collection"}
+      />
 
-        <div className="pt-[52px]">
-          <div className="max-w-5xl mx-auto px-4 md:px-6 py-10 md:py-14">
-            {isLoading && (
-              <div className="flex flex-col items-center justify-center py-20">
-                <Loader2 className="w-8 h-8 text-text-muted animate-spin mb-4" />
-                <p className="text-text-muted">Loading collection…</p>
-              </div>
-            )}
+      <div className="pt-[56px]">
+        <div className="max-w-5xl mx-auto px-6 md:px-10 py-12 md:py-16">
+          {isLoading && (
+            <div className="flex flex-col items-center justify-center py-24">
+              <Loader2 className="w-6 h-6 text-paper-dim animate-spin mb-4" />
+              <p className="text-colophon">Loading collection</p>
+            </div>
+          )}
 
-            {!isLoading && !collection && (
-              <div className="flex flex-col items-center justify-center py-20">
-                <p className="text-text-muted">Collection not found</p>
-                <Link href="/collections">
-                  <Button variant="outline" className="mt-4">
-                    Browse collections
-                  </Button>
+          {!isLoading && !collection && (
+            <div className="flex flex-col items-center justify-center py-24">
+              <p className="text-paper-faint mb-6">Collection not found</p>
+              <Link href="/collections">
+                <Button variant="outline">Browse collections</Button>
+              </Link>
+            </div>
+          )}
+
+          {!isLoading && collection && (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: HERO_EASE }}
+            >
+              <div className="mb-12 pb-6 border-b border-rule">
+                <Link
+                  href="/collections"
+                  className="text-colophon hover:text-gold transition-colors"
+                >
+                  ← Exhibit
                 </Link>
+                <h1 className="text-display text-4xl md:text-6xl text-paper mt-4 mb-4">
+                  {collection.title}
+                </h1>
+                <p className="text-paper-faint max-w-2xl leading-relaxed">
+                  {collection.description}
+                </p>
               </div>
-            )}
 
-            {!isLoading && collection && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, ease: HERO_EASE }}
-              >
-                <div className="mb-10">
-                  <Link
-                    href="/collections"
-                    className="text-2xs uppercase tracking-[0.2em] text-amber-400 font-medium hover:text-amber-300 transition-colors"
+              {snapshots.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-24">
+                  <p className="text-paper-faint">No sites with archive data found</p>
+                </div>
+              )}
+
+              <div className="border-t border-rule">
+                {snapshots.map((snapshot, i) => (
+                  <motion.div
+                    key={snapshot.site}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.4, ease: HERO_EASE, delay: i * 0.05 }}
                   >
-                    ← Exhibit
-                  </Link>
-                  <h1 className="text-display text-4xl md:text-5xl text-text-primary mt-3 mb-3">
-                    {collection.title}
-                  </h1>
-                  <p className="text-text-tertiary max-w-2xl leading-relaxed">
-                    {collection.description}
-                  </p>
-                </div>
-
-                {snapshots.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-20">
-                    <p className="text-text-muted">No sites with archive data found</p>
-                  </div>
-                )}
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {snapshots.map((snapshot, i) => (
-                    <motion.div
-                      key={snapshot.site}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, ease: HERO_EASE, delay: i * 0.05 }}
-                    >
-                      <Link href={`/explore/${snapshot.site}/${snapshot.firstCapture}`} className="block group">
-                        <Card className="h-full hover:shadow-glow-amber hover:-translate-y-0.5 transition-all duration-300">
-                          <div className="p-6">
-                            <div className="flex items-start justify-between mb-4">
-                              <div>
-                                <h3 className="text-display text-lg text-text-primary group-hover:tf-text-gradient transition-all">
-                                  {snapshot.site}
-                                </h3>
-                                <p className="text-sm text-text-muted">
-                                  {snapshot.totalCaptures.toLocaleString()} snapshots
-                                </p>
-                              </div>
-                              <ArrowRight className="w-4 h-4 text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
-                            </div>
-
-                            <div className="text-xs text-text-muted font-mono space-y-1 pt-3 border-t border-glass-border">
-                              <p>First: <span className="text-amber-300">{formatDate(snapshot.firstCapture)}</span></p>
-                              <p>Last: <span className="text-amber-300">{formatDate(snapshot.lastCapture)}</span></p>
-                            </div>
+                    <Link href={`/explore/${snapshot.site}/${snapshot.firstCapture}`} className="group block border-b border-rule hover:bg-ink-panel transition-colors duration-200">
+                      <div className="py-6 px-1 flex items-start justify-between gap-6">
+                        <div className="min-w-0">
+                          <div className="text-colophon mb-2">
+                            {String(i + 1).padStart(2, "0")}
                           </div>
-                        </Card>
-                      </Link>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </div>
+                          <h3 className="font-display text-xl text-paper mb-1 group-hover:text-gold transition-colors">
+                            {snapshot.site}
+                          </h3>
+                          <p className="text-xs text-paper-dim font-mono">
+                            {snapshot.totalCaptures.toLocaleString()} snapshots
+                          </p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <div className="text-xs text-paper-dim font-mono space-y-0.5">
+                            <p>First <span className="text-gold">{formatDate(snapshot.firstCapture)}</span></p>
+                            <p>Last <span className="text-gold">{formatDate(snapshot.lastCapture)}</span></p>
+                          </div>
+                          <ArrowRight className="w-4 h-4 text-gold mt-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+                        </div>
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          )}
         </div>
       </div>
     </main>

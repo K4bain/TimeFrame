@@ -1,31 +1,20 @@
 import Link from "next/link";
-import { Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { AuroraBackground } from "@/components/aurora-background";
 
 export default function NotFound() {
   return (
-    <main className="relative min-h-screen flex flex-col items-center justify-center">
-      <AuroraBackground />
-      <div className="relative z-10 flex flex-col items-center px-6 text-center">
-        <div className="tf-glass-strong rounded-2xl p-10 md:p-14 max-w-md">
-          <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-full tf-glass">
-            <Compass className="h-8 w-8 text-amber-400" aria-hidden="true" />
-          </div>
-          <span className="text-2xs uppercase tracking-[0.2em] text-amber-400 font-medium mb-3 block">
-            404
-          </span>
-          <h1 className="text-display text-2xl md:text-3xl text-text-primary mb-3">
-            Page not found
-          </h1>
-          <p className="mt-1 max-w-sm text-sm text-text-secondary">
-            The page you&apos;re looking for doesn&apos;t exist or has been moved.
-          </p>
-          <Button asChild variant="secondary" className="mt-8">
-            <Link href="/">Back to Timeframe</Link>
-          </Button>
-        </div>
-      </div>
-    </main>
+    <div className="relative flex min-h-screen flex-col items-center justify-center px-6 text-center">
+      <span className="text-eyebrow mb-8">404 — Not Found</span>
+      <h1 className="text-display text-4xl md:text-6xl text-paper mb-4">
+        Page not found
+      </h1>
+      <div className="w-16 h-px bg-rule my-8" />
+      <p className="max-w-sm text-sm text-paper-faint leading-relaxed">
+        The page you&apos;re looking for doesn&apos;t exist or has been moved.
+      </p>
+      <Button asChild variant="outline" className="mt-10">
+        <Link href="/">Back to Timeframe</Link>
+      </Button>
+    </div>
   );
 }

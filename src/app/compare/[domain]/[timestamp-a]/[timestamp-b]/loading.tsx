@@ -1,25 +1,20 @@
 export default function CompareLoading() {
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Chrome bar skeleton — ZONE.CHRO */}
-      <div className="flex items-center gap-4 border-b border-glass-border px-6 py-3 tf-glass-strong">
-        <div className="tf-skeleton tf-skeleton--shimmer h-4 w-24 rounded" />
-        <div className="tf-skeleton tf-skeleton--shimmer h-4 w-32 rounded" />
-        <div className="tf-skeleton tf-skeleton--shimmer h-9 w-28 rounded" />
+      <div className="flex items-center gap-4 border-b border-rule px-6 md:px-10 py-3.5">
+        <div className="tf-skeleton tf-skeleton--shimmer h-5 w-28" />
+        <div className="tf-skeleton tf-skeleton--shimmer h-4 w-40" />
+        <div className="tf-skeleton tf-skeleton--shimmer h-9 w-28 ml-auto" />
       </div>
 
-      {/* Two-panel viewer skeleton — ZONE.STGE — MOT.6 */}
-      <div className="grid flex-1 grid-cols-1 md:grid-cols-2">
+      <div className="grid flex-1 grid-cols-1 md:grid-cols-2 gap-4 p-6 md:px-10">
         {[0, 1].map((i) => (
-          <div
-            key={i}
-            className="border-r border-glass-border p-4 last:border-r-0"
-          >
-            <div className="mb-3 flex items-center justify-between">
-              <div className="tf-skeleton tf-skeleton--shimmer h-4 w-32 rounded" />
-              <div className="tf-skeleton tf-skeleton--shimmer h-4 w-20 rounded" />
+          <div key={i} className="border border-rule">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-rule">
+              <div className="tf-skeleton tf-skeleton--shimmer h-4 w-20" />
+              <div className="tf-skeleton tf-skeleton--shimmer h-4 w-28" />
             </div>
-            <div className="tf-skeleton tf-skeleton--shimmer aspect-video w-full rounded-xl" />
+            <div className="tf-skeleton tf-skeleton--shimmer aspect-video" />
           </div>
         ))}
       </div>

@@ -91,41 +91,37 @@ export function ContextPanel({
 
   if (isLoading) {
     return (
-      <div className="p-4 space-y-4">
+      <div className="p-6 space-y-6">
         <div className="space-y-2">
-          <div className="h-4 bg-bg-elevated rounded w-3/4 animate-pulse" />
-          <div className="h-3 bg-bg-elevated rounded w-1/2 animate-pulse" />
+          <div className="h-4 tf-skeleton tf-skeleton--shimmer w-3/4" />
+          <div className="h-3 tf-skeleton tf-skeleton--shimmer w-1/2" />
         </div>
         <div className="space-y-2">
-          <div className="h-3 bg-bg-elevated rounded w-full animate-pulse" />
-          <div className="h-3 bg-bg-elevated rounded w-2/3 animate-pulse" />
+          <div className="h-3 tf-skeleton tf-skeleton--shimmer w-full" />
+          <div className="h-3 tf-skeleton tf-skeleton--shimmer w-2/3" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 space-y-4 text-sm">
+    <div className="p-6 space-y-6 text-sm">
       {/* Site Overview */}
       <div className="space-y-2">
-        <h3 className="font-medium text-text-primary truncate">{domain}</h3>
-        <div className="space-y-1 text-text-muted">
+        <h3 className="font-display text-base text-paper truncate">{domain}</h3>
+        <div className="space-y-1.5 text-paper-faint font-mono text-xs">
           {firstArchived && (
             <p>
-              First archived:{" "}
-              <span className="font-mono text-temporal-text">
-                {formatDate(firstArchived)}
-              </span>
+              First archived{" "}
+              <span className="text-gold">{formatDate(firstArchived)}</span>
             </p>
           )}
           <p>
-            Total snapshots:{" "}
-            <span className="font-mono text-temporal-text">
-              {totalSnapshots.toLocaleString()}
-            </span>
+            Total{" "}
+            <span className="text-gold">{totalSnapshots.toLocaleString()}</span>{" "}
+            snapshots
           </p>
           <p>
-            Coverage:{" "}
             <Badge variant="temporal">
               {coverageQuality ? coverageQuality.charAt(0).toUpperCase() + coverageQuality.slice(1) : "Sparse"}
             </Badge>
@@ -135,36 +131,36 @@ export function ContextPanel({
 
       {/* Active Snapshot */}
       {selectedCapture && eraInfo && (
-        <div className="pt-3 border-t border-border-subtle space-y-2">
+        <div className="pt-5 border-t border-rule space-y-2">
           <Badge variant="temporal">{eraInfo.name}</Badge>
           {eraInfo.description && (
-            <p className="text-text-muted text-xs">{eraInfo.description}</p>
+            <p className="text-paper-dim text-xs">{eraInfo.description}</p>
           )}
-          <p className="font-mono text-temporal-text text-base">
+          <p className="font-mono text-gold text-sm">
             {formatDate(selectedCapture.timestamp)}
           </p>
           {snapshotOrdinal && (
-            <p className="text-text-muted text-xs">Snapshot {snapshotOrdinal}</p>
+            <p className="text-paper-dim text-xs font-mono">Snapshot {snapshotOrdinal}</p>
           )}
         </div>
       )}
 
       {/* Change Summary */}
       {isChangeMarker && (
-        <div className="pt-3 border-t border-border-subtle space-y-1">
-          <p className="text-temporal-text font-medium text-xs">Change detected</p>
+        <div className="pt-5 border-t border-rule space-y-1">
+          <p className="text-gold font-medium text-xs font-mono">Change detected</p>
           {changeDesc && (
-            <p className="text-text-muted text-xs">{changeDesc}</p>
+            <p className="text-paper-dim text-xs font-mono">{changeDesc}</p>
           )}
-          <p className="text-text-muted text-xs">
+          <p className="text-paper-dim text-xs">
             Significant change detected between adjacent snapshots.
           </p>
         </div>
       )}
 
       {/* Archive Notice */}
-      <div className="pt-3 border-t border-border-subtle">
-        <p className="text-text-muted text-xs leading-relaxed">
+      <div className="pt-5 border-t border-rule">
+        <p className="text-paper-dim text-xs leading-relaxed">
           Snapshots are sourced from the Internet Archive. Coverage and rendering
           quality may vary.
         </p>
