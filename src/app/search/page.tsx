@@ -137,7 +137,7 @@ function SearchContent() {
                       href={`/explore/${result.site}/${capture.timestamp}`}
                       className="block group"
                     >
-                      <Card className="hover:border-border-focus hover:shadow-md transition-all duration-150">
+                      <Card className="hover:shadow-glow-amber transition-all duration-300">
                         <div className="p-4 flex items-center justify-between gap-4">
                           <div className="min-w-0">
                             <div className="flex items-center gap-2 mb-1">

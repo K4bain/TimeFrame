@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SiteHeader } from "@/components/layout/site-header";
+import { AuroraBackground } from "@/components/aurora-background";
 import { useCompare } from "@/features/compare/use-compare";
 import { formatDate } from "@/utils";
 import type { AppError } from "@/types/errors";
@@ -63,12 +64,12 @@ function CompareContent() {
   ) => {
     const message = errorMessage(error);
     return (
-      <Card className="overflow-hidden">
-        <div className="p-4 border-b border-border-subtle flex items-baseline gap-2">
+      <Card className="overflow-hidden hover:shadow-glow-cyan transition-shadow duration-300">
+        <div className="p-4 border-b border-glass-border flex items-baseline gap-2">
           <span className="text-2xs uppercase tracking-wider text-text-muted font-medium">
             {side === "left" ? "Earlier" : "Later"}
           </span>
-          <p className="font-mono text-temporal-text text-sm font-medium">
+          <p className="font-mono text-amber-300 text-sm font-medium">
             {formatDate(timestamp)}
           </p>
         </div>
@@ -103,41 +104,44 @@ function CompareContent() {
 
   return (
     <>
-      <SiteHeader
-        backHref={`/explore/${domain}/${timestampA}`}
-        backLabel="Back to explore"
-        title={
-          <span className="flex items-baseline gap-2">
-            <span className="text-text-primary">{domain}</span>
-          </span>
-        }
-        subtitle={
-          <span className="flex items-center gap-2">
-            <span className="font-mono text-temporal-text">{formatDate(timestampA)}</span>
-            <span className="text-text-tertiary">vs</span>
-            <span className="font-mono text-temporal-text">{formatDate(timestampB)}</span>
-          </span>
-        }
-        innerClassName="max-w-6xl mx-auto px-4 md:px-6"
-      >
-        <Button variant="outline" size="icon" onClick={() => navigateTo(-30)} aria-label="Go back 30 days">
-          <ChevronLeft className="w-4 h-4" />
-        </Button>
-        <Button variant="outline" size="icon" onClick={() => navigateTo(30)} aria-label="Go forward 30 days">
-          <ChevronRight className="w-4 h-4" />
-        </Button>
-      </SiteHeader>
+      <AuroraBackground />
+      <div className="relative z-10">
+        <SiteHeader
+          backHref={`/explore/${domain}/${timestampA}`}
+          backLabel="Back to explore"
+          title={
+            <span className="flex items-baseline gap-2">
+              <span className="text-text-primary">{domain}</span>
+            </span>
+          }
+          subtitle={
+            <span className="flex items-center gap-2">
+              <span className="font-mono text-amber-300">{formatDate(timestampA)}</span>
+              <span className="text-text-tertiary">vs</span>
+              <span className="font-mono text-cyan-300">{formatDate(timestampB)}</span>
+            </span>
+          }
+          innerClassName="max-w-6xl mx-auto px-4 md:px-6"
+        >
+          <Button variant="outline" size="icon" onClick={() => navigateTo(-30)} aria-label="Go back 30 days">
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+          <Button variant="outline" size="icon" onClick={() => navigateTo(30)} aria-label="Go forward 30 days">
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </SiteHeader>
 
-      <div className="pt-[52px]">
-        <div className="max-w-6xl mx-auto px-4 md:px-6 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {renderPanel("left", timestampA, state.left.isLoading, state.left.error, state.left.waybackUrl)}
-            {renderPanel("right", timestampB, state.right.isLoading, state.right.error, state.right.waybackUrl)}
+        <div className="pt-[52px]">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 py-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {renderPanel("left", timestampA, state.left.isLoading, state.left.error, state.left.waybackUrl)}
+              {renderPanel("right", timestampB, state.right.isLoading, state.right.error, state.right.waybackUrl)}
+            </div>
+
+            <p className="text-xs text-text-muted mt-4 text-center md:hidden">
+              Side-by-side view available on larger screens
+            </p>
           </div>
-
-          <p className="text-xs text-text-muted mt-4 text-center md:hidden">
-            Side-by-side view available on larger screens
-          </p>
         </div>
       </div>
     </>

@@ -356,7 +356,7 @@ function ExploreContent() {
       {/* Chrome - COMP.2 */}
       <SiteHeader wordmark innerClassName="max-w-7xl mx-auto px-4 md:px-6">
         <form onSubmit={handleSearch} className="flex-1 max-w-xs">
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-bg-base border border-border-subtle rounded-sm focus-within:border-temporal-border transition-colors">
+          <div className="flex items-center gap-2 px-3 py-1.5 tf-glass rounded-lg focus-within:shadow-glow-amber transition-shadow duration-300">
             <Search className="w-3.5 h-3.5 text-text-muted shrink-0" aria-hidden="true" />
             <Input
               type="text"
@@ -463,7 +463,7 @@ function ExploreContent() {
                   <div className="mb-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                     <span className="text-display text-xl text-text-primary">{domain}</span>
                     <span className="text-text-muted">/</span>
-                    <span className="font-mono text-temporal-text text-sm">
+                    <span className="font-mono text-amber-300 text-sm">
                       {formatDate(selectedCapture.timestamp)}
                     </span>
                     <span className="text-text-muted">/</span>
@@ -691,6 +691,7 @@ function ExploreContent() {
             }
           />
         </div>
+      </div>
       </div>
     </div>
   );

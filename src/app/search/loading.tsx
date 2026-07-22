@@ -2,7 +2,7 @@ export default function SearchLoading() {
   return (
     <div className="flex min-h-screen flex-col">
       {/* Chrome bar skeleton */}
-      <div className="flex items-center gap-4 border-b border-border-subtle px-6 py-3">
+      <div className="flex items-center gap-4 border-b border-glass-border px-6 py-3 tf-glass-strong">
         <div className="tf-skeleton tf-skeleton--shimmer h-4 w-24 rounded" />
         <div className="tf-skeleton tf-skeleton--shimmer h-9 max-w-md flex-1 rounded" />
         <div className="tf-skeleton tf-skeleton--shimmer h-9 w-24 rounded" />
@@ -17,7 +17,7 @@ export default function SearchLoading() {
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
-                className="tf-skeleton tf-skeleton--shimmer h-16 rounded-md border border-border-subtle"
+                className="tf-skeleton tf-skeleton--shimmer h-16 rounded-xl border border-glass-border"
               />
             ))}
           </div>
