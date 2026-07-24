@@ -315,6 +315,35 @@ body {
   background: var(--color-rule-bright);
 }
 
+/* ─── Focus-visible (editorial gold ring) ──────────────── */
+:focus-visible {
+  outline: 1px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+/* ─── Keyframe: gold pulse for live indicators ─────────── */
+@keyframes gold-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* ─── Marquee-style subtle text shimmer on h1 ───────────── */
+@keyframes text-breathe {
+  0%, 100% { opacity: 0.95; }
+  50% { opacity: 1; }
+}
+
+/* ─── Line rule animation (reveal on scroll) ────────────── */
+@keyframes rule-reveal {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.rule-reveal {
+  transform-origin: left;
+  animation: rule-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 /* ─── Reduced motion ────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -324,5 +353,18 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ─── Print (editorial: clean monograph output) ────────── */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  .tf-aurora,
+  nav,
+  header {
+    display: none;
   }
 }

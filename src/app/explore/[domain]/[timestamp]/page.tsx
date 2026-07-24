@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useCallback, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Loader2,
   AlertCircle,
@@ -13,6 +13,10 @@ import {
   Minimize2,
   ExternalLink,
   Search,
+  Play,
+  Pause,
+  Shuffle,
+  Info,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip } from "@/components/ui/tooltip";
@@ -20,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ErrorDisplay } from "@/components/error-states/error-display";
 import { ContextPanel } from "@/components/context/context-panel";
+import { TimeMachineBar } from "@/components/explore/time-machine-bar";
 import { useTimeline } from "@/features/timeline/use-timeline";
 import { useViewer } from "@/features/viewer/use-viewer";
 import { formatDate, getEra, normalizeUrl } from "@/utils";
@@ -27,6 +32,18 @@ import Link from "next/link";
 import type { Capture } from "@/types";
 
 const MAX_DOTS = 100;
+const AUTOPLAY_INTERVAL = 1400;
+
+const ERA_NAMES: Record<string, string> = {
+  "early-web": "Early Web",
+  "browser-wars": "Browser Wars",
+  "post-crash": "Post-Crash",
+  "web-20": "Web 2.0",
+  "mobile-transition": "Mobile",
+  "flat-design": "Flat Design",
+  "platform-web": "Platform",
+  "ai-transition": "AI Era",
+};
 
 function EraBand({
   era,
@@ -46,17 +63,6 @@ function EraBand({
   const width = ((endYear - startYear) / totalSpan) * 100;
 
   if (width < 2) return null;
-
-  const ERA_NAMES: Record<string, string> = {
-    "early-web": "Early Web",
-    "browser-wars": "Browser Wars",
-    "post-crash": "Post-Crash",
-    "web-20": "Web 2.0",
-    "mobile-transition": "Mobile",
-    "flat-design": "Flat Design",
-    "platform-web": "Platform",
-    "ai-transition": "AI Era",
-  };
 
   return (
     <div
@@ -118,6 +124,140 @@ function ChangeMarker({
   );
 }
 
+/**
+ * EraFingerprint — a visual "DNA barcode" showing which eras this site
+ * was active in. Each era is a vertical bar whose height represents
+ * the number of captures in that era. Interactive: hover reveals details.
+ */
+function EraFingerprint({
+  captures,
+  selectedCapture,
+  onSelectEra,
+}: {
+  captures: Capture[];
+  selectedCapture: Capture | null;
+  onSelectEra: (era: string) => void;
+}) {
+  const [hoveredEra, setHoveredEra] = useState<string | null>(null);
+
+  const eraCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const c of captures) {
+      const era = getEra(c.timestamp);
+      counts[era] = (counts[era] || 0) + 1;
+    }
+    return counts;
+  }, [captures]);
+
+  const maxCount = Math.max(...Object.values(eraCounts), 1);
+  const currentEra = selectedCapture ? getEra(selectedCapture.timestamp) : null;
+  const eras = ["early-web", "browser-wars", "post-crash", "web-20", "mobile-transition", "flat-design", "platform-web", "ai-transition"];
+
+  return (
+    <div className="border border-rule bg-ink-panel p-4">
+      <p className="text-colophon mb-3">Era fingerprint</p>
+      <div className="flex items-end gap-1.5 h-16">
+        {eras.map((era) => {
+          const count = eraCounts[era] || 0;
+          const height = count > 0 ? Math.max((count / maxCount) * 100, 8) : 0;
+          const isActive = era === currentEra;
+          const isHovered = era === hoveredEra;
+          return (
+            <Tooltip
+              key={era}
+              content={`${ERA_NAMES[era]}: ${count.toLocaleString()} snapshots`}
+            >
+              <button
+                onClick={() => count > 0 && onSelectEra(era)}
+                onMouseEnter={() => setHoveredEra(era)}
+                onMouseLeave={() => setHoveredEra(null)}
+                className={`
+                  flex-1 min-h-[4px] transition-all duration-200 relative
+                  ${count > 0 ? "cursor-pointer" : "cursor-default"}
+                `}
+                style={{ height: `${height}%` }}
+                aria-label={`${ERA_NAMES[era]}: ${count} snapshots`}
+              >
+                <div
+                  className={`
+                    absolute inset-0 transition-colors duration-200
+                    ${count === 0
+                      ? "bg-rule/30"
+                      : isActive
+                        ? "bg-gold"
+                        : isHovered
+                          ? "bg-gold/60"
+                          : "bg-gold/25"
+                    }
+                  `}
+                />
+              </button>
+            </Tooltip>
+          );
+        })}
+      </div>
+      <div className="flex gap-1.5 mt-1">
+        {eras.map((era) => (
+          <div key={era} className="flex-1 text-center">
+            <span className={`text-2xs font-mono transition-colors ${era === currentEra ? "text-gold" : "text-paper-dim"}`}>
+              {ERA_NAMES[era]?.split(" ").map(w => w[0]).join("")}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * QuickEraNav — era pills that jump to the first capture of each era.
+ */
+function QuickEraNav({
+  captures,
+  selectedIndex,
+  onNavigate,
+}: {
+  captures: Capture[];
+  selectedIndex: number;
+  onNavigate: (capture: Capture) => void;
+}) {
+  const eras = useMemo(() => {
+    const seen = new Map<string, number>();
+    captures.forEach((c, i) => {
+      const era = getEra(c.timestamp);
+      if (!seen.has(era)) seen.set(era, i);
+    });
+    return Array.from(seen.entries()).map(([era, index]) => ({
+      era,
+      label: ERA_NAMES[era] || era,
+      capture: captures[index],
+    }));
+  }, [captures]);
+
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
+      {eras.map(({ era, label, capture }) => {
+        const currentEra = getEra(captures[selectedIndex]?.timestamp || "");
+        const isActive = era === currentEra;
+        return (
+          <button
+            key={era}
+            onClick={() => onNavigate(capture)}
+            className={`text-2xs font-mono uppercase tracking-wider px-2.5 py-1 border transition-all duration-200 ${
+              isActive
+                ? "border-gold/40 text-gold bg-gold/5"
+                : "border-transparent text-paper-dim hover:text-paper-faint hover:border-rule"
+            }`}
+            aria-label={`Jump to ${label} era`}
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function ExploreContent() {
   const params = useParams();
   const router = useRouter();
@@ -143,7 +283,26 @@ function ExploreContent() {
   const [isIframeLoading, setIsIframeLoading] = useState(true);
   const [canFullscreen, setCanFullscreen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const lastWaybackUrl = useRef("");
+  const playRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const atEnd = selectedIndex >= captures.length - 1;
+
+  // Autoplay effect
+  useEffect(() => {
+    if (!isPlaying) return;
+    if (atEnd) { setIsPlaying(false); return; }
+    playRef.current = setInterval(() => {
+      const next = captures[selectedIndex + 1];
+      if (next) {
+        router.push(`/explore/${domain}/${next.timestamp}`);
+      } else {
+        setIsPlaying(false);
+      }
+    }, AUTOPLAY_INTERVAL);
+    return () => { if (playRef.current) clearInterval(playRef.current); };
+  }, [isPlaying, selectedIndex, captures, atEnd, domain, router]);
 
   useEffect(() => {
     if (viewerState.waybackUrl && !viewerState.error) {
@@ -185,6 +344,12 @@ function ExploreContent() {
         const d = captureDate(ts);
         d.setMonth(d.getMonth() + months);
         return d.toISOString().slice(0, 10).replace(/-/g, "") + "000000";
+      }
+
+      if (e.key === " ") {
+        e.preventDefault();
+        setIsPlaying((p) => !p);
+        return;
       }
 
       if (e.key === "ArrowLeft") {
@@ -237,6 +402,13 @@ function ExploreContent() {
         if (captures.length > 0) {
           router.push(`/explore/${domain}/${captures[captures.length - 1].timestamp}`);
         }
+      } else if (e.key === "r" || e.key === "R") {
+        // Random jump
+        if (captures.length < 2) return;
+        setIsPlaying(false);
+        let ri = Math.floor(Math.random() * captures.length);
+        if (ri === selectedIndex) ri = (ri + 1) % captures.length;
+        router.push(`/explore/${domain}/${captures[ri].timestamp}`);
       }
     },
     [goToPrevious, goToNext, captures, selectedIndex, domain, router]
@@ -287,6 +459,20 @@ function ExploreContent() {
     },
     [selectedIndex, captures, domain, router]
   );
+
+  const handleEraJump = useCallback((era: string) => {
+    setIsPlaying(false);
+    const firstCapture = captures.find((c) => getEra(c.timestamp) === era);
+    if (firstCapture) router.push(`/explore/${domain}/${firstCapture.timestamp}`);
+  }, [captures, domain, router]);
+
+  const handleShuffle = useCallback(() => {
+    setIsPlaying(false);
+    if (captures.length < 2) return;
+    let ri = Math.floor(Math.random() * captures.length);
+    if (ri === selectedIndex) ri = (ri + 1) % captures.length;
+    router.push(`/explore/${domain}/${captures[ri].timestamp}`);
+  }, [captures, selectedIndex, domain, router]);
 
   const selectedYear = selectedCapture
     ? parseInt(selectedCapture.timestamp.slice(0, 4), 10)
@@ -371,15 +557,44 @@ function ExploreContent() {
         </form>
 
         {captures.length > 0 && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <Link
               href={`/compare/${domain}/${captures[0].timestamp}/${captures[captures.length - 1].timestamp}`}
             >
               <Button variant="ghost" size="sm">
                 <GitCompare className="w-4 h-4 mr-1" />
-                Compare
+                <span className="hidden sm:inline">Compare</span>
               </Button>
             </Link>
+
+            {/* Play/Pause */}
+            <Tooltip content={isPlaying ? "Pause time-lapse (Space)" : "Play time-lapse (Space)"}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsPlaying((p) => !p)}
+                disabled={captures.length < 2 || (atEnd && !isPlaying)}
+                aria-label={isPlaying ? "Pause time-lapse" : "Play time-lapse"}
+              >
+                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              </Button>
+            </Tooltip>
+
+            {/* Random */}
+            <Tooltip content="Random snapshot (R)">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleShuffle}
+                disabled={captures.length < 2}
+                aria-label="Jump to random snapshot"
+              >
+                <Shuffle className="w-4 h-4" />
+              </Button>
+            </Tooltip>
+
+            <div className="w-px h-6 bg-rule" aria-hidden="true" />
+
             <Button
               variant="ghost"
               size="icon"
@@ -398,6 +613,8 @@ function ExploreContent() {
             >
               <ChevronRight className="w-4 h-4" />
             </Button>
+
+            <div className="w-px h-6 bg-rule" aria-hidden="true" />
 
             {viewerState.waybackUrl && (
               <Button variant="ghost" size="icon" asChild aria-label="Open in Wayback Machine">
@@ -421,9 +638,67 @@ function ExploreContent() {
                 )}
               </Button>
             )}
+
+            {/* Keyboard shortcuts toggle */}
+            <Tooltip content="Keyboard shortcuts">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowShortcuts((s) => !s)}
+                aria-label="Show keyboard shortcuts"
+              >
+                <Info className="w-4 h-4" />
+              </Button>
+            </Tooltip>
           </div>
         )}
       </SiteHeader>
+
+      {/* Keyboard shortcuts overlay */}
+      <AnimatePresence>
+        {showShortcuts && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-ink-void/80 flex items-center justify-center"
+            onClick={() => setShowShortcuts(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="border border-rule bg-ink-panel p-8 max-w-sm w-full mx-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-display text-xl text-paper mb-6">Keyboard shortcuts</h3>
+              <div className="space-y-3">
+                {[
+                  ["← →", "Previous / Next snapshot"],
+                  ["Shift + ← →", "Jump by month"],
+                  ["Ctrl + ← →", "Jump by year"],
+                  ["Home / End", "First / Last snapshot"],
+                  ["Space", "Play / Pause time-lapse"],
+                  ["R", "Random snapshot"],
+                ].map(([key, desc]) => (
+                  <div key={key} className="flex justify-between items-center">
+                    <kbd className="font-mono text-xs px-2 py-1 border border-rule text-gold">{key}</kbd>
+                    <span className="text-sm text-paper-faint">{desc}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 pt-4 border-t border-rule">
+                <button
+                  onClick={() => setShowShortcuts(false)}
+                  className="text-sm text-paper-dim hover:text-paper transition-colors"
+                >
+                  Press Esc or click outside to close
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="flex-1 flex pt-[56px]">
         {/* Left: Timeline + Viewer */}
@@ -460,21 +735,41 @@ function ExploreContent() {
               >
                 {/* Metadata bar */}
                 {selectedCapture && (
-                  <div className="mb-8 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                    <span className="text-display text-2xl text-paper">{domain}</span>
-                    <span className="text-paper-dim">/</span>
-                    <span className="font-mono text-gold text-sm">
-                      {formatDate(selectedCapture.timestamp)}
-                    </span>
-                    <span className="text-paper-dim">/</span>
-                    <span className="text-paper-faint text-sm font-mono">
-                      {selectedIndex + 1} of {captures.length}
-                    </span>
+                  <div className="mb-6">
+                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-4">
+                      <span className="text-display text-2xl text-paper">{domain}</span>
+                      <span className="text-paper-dim">/</span>
+                      <span className="font-mono text-gold text-sm">
+                        {formatDate(selectedCapture.timestamp)}
+                      </span>
+                      <span className="text-paper-dim font-mono text-xs">
+                        — {selectedIndex + 1} of {captures.length.toLocaleString()}
+                      </span>
+                    </div>
+
+                    {/* TimeMachineBar with play/random/era nav */}
+                    <TimeMachineBar
+                      captures={captures}
+                      selectedIndex={selectedIndex}
+                      onNavigate={(capture) => router.push(`/explore/${domain}/${capture.timestamp}`)}
+                    />
                   </div>
                 )}
 
+                {/* Era Navigator Pills */}
+                <div className="mb-6">
+                  <QuickEraNav
+                    captures={captures}
+                    selectedIndex={selectedIndex}
+                    onNavigate={(capture) => {
+                      setIsPlaying(false);
+                      router.push(`/explore/${domain}/${capture.timestamp}`);
+                    }}
+                  />
+                </div>
+
                 {/* Timeline with Era Bands */}
-                <div className="mb-8">
+                <div className="mb-6">
                   <div className="relative h-6 mb-1">
                     {eras.map(({ era, start, end }) => (
                       <EraBand
@@ -533,7 +828,7 @@ function ExploreContent() {
                 </div>
 
                 {/* Scrubber with Change Markers */}
-                <div className="mb-8">
+                <div className="mb-6">
                   <div
                     className="relative h-12 bg-ink-panel border border-rule overflow-hidden"
                     role="slider"
@@ -593,73 +888,117 @@ function ExploreContent() {
                       })}
                     </div>
                   </div>
-                  <p className="text-colophon text-center mt-3">
-                    Use ← → arrow keys to navigate
+                  <p className="text-colophon text-center mt-2">
+                    ← → navigate · Shift ± month · Ctrl ± year · Space play · R random
                   </p>
                 </div>
 
-                {/* Viewer */}
-                {selectedCapture && (
-                  <motion.div
-                    key={selectedCapture.timestamp}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="border border-rule bg-ink-panel overflow-hidden"
-                  >
-                    <div className="aspect-video relative bg-ink-void">
-                      {(() => {
-                        const showUrl = viewerState.waybackUrl || lastWaybackUrl.current;
+                {/* Era Fingerprint + Viewer */}
+                <div className="grid lg:grid-cols-4 gap-4">
+                  <div className="lg:col-span-1 space-y-4">
+                    {selectedCapture && (
+                      <EraFingerprint
+                        captures={captures}
+                        selectedCapture={selectedCapture}
+                        onSelectEra={handleEraJump}
+                      />
+                    )}
 
-                        if (viewerState.isLoading && !showUrl) {
-                          return (
-                            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                              <Loader2 className="w-6 h-6 text-paper-dim animate-spin mb-4" />
-                              <p className="text-colophon">Loading snapshot</p>
-                            </div>
-                          );
-                        }
+                    {/* Progress indicator */}
+                    {captures.length > 0 && (
+                      <div className="border border-rule bg-ink-panel p-4">
+                        <p className="text-colophon mb-2">Position</p>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-display text-xl text-gold tabular-nums">{selectedIndex + 1}</span>
+                          <span className="text-paper-dim font-mono text-xs">of {captures.length.toLocaleString()}</span>
+                        </div>
+                        <div className="mt-3 h-1 bg-ink-void">
+                          <div
+                            className="h-full bg-gold/40 transition-all duration-300"
+                            style={{ width: `${((selectedIndex + 1) / captures.length) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
-                        if (showUrl) {
-                          return (
-                            <>
-                              {isIframeLoading && (
+                  <div className="lg:col-span-3">
+                    {/* Viewer */}
+                    {selectedCapture && (
+                      <motion.div
+                        key={selectedCapture.timestamp}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="border border-rule bg-ink-panel overflow-hidden"
+                      >
+                        <div className="aspect-video relative bg-ink-void">
+                          {(() => {
+                            const showUrl = viewerState.waybackUrl || lastWaybackUrl.current;
+
+                            if (viewerState.isLoading && !showUrl) {
+                              return (
                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                                   <Loader2 className="w-6 h-6 text-paper-dim animate-spin mb-4" />
-                                  <p className="text-colophon">Rendering snapshot</p>
+                                  <p className="text-colophon">Loading snapshot</p>
                                 </div>
-                              )}
-                              <div className={`h-full transition-opacity duration-300 ${isIframeLoading ? 'opacity-0' : 'opacity-100'}`}>
-                                <iframe
-                                  src={showUrl}
-                                  className="w-full h-full border-0 bg-ink-void"
-                                  title={`Archived version of ${domain} from ${formatDate(selectedCapture.timestamp)}`}
-                                  sandbox="allow-scripts allow-same-origin"
-                                  referrerPolicy="no-referrer"
-                                  onLoad={() => setIsIframeLoading(false)}
-                                />
-                              </div>
-                            </>
-                          );
-                        }
+                              );
+                            }
 
-                        if (viewerState.error) {
-                          return (
-                            <div className="absolute inset-0">
-                              <ErrorDisplay
-                                error={viewerState.error}
-                                onAction={() => window.location.reload()}
-                                className="h-full justify-center"
-                              />
-                            </div>
-                          );
-                        }
+                            if (showUrl) {
+                              return (
+                                <>
+                                  {isIframeLoading && (
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                      <Loader2 className="w-6 h-6 text-paper-dim animate-spin mb-4" />
+                                      <p className="text-colophon">Rendering snapshot</p>
+                                    </div>
+                                  )}
+                                  <div className={`h-full transition-opacity duration-300 ${isIframeLoading ? 'opacity-0' : 'opacity-100'}`}>
+                                    <iframe
+                                      src={showUrl}
+                                      className="w-full h-full border-0 bg-ink-void"
+                                      title={`Archived version of ${domain} from ${formatDate(selectedCapture.timestamp)}`}
+                                      sandbox="allow-scripts allow-same-origin"
+                                      referrerPolicy="no-referrer"
+                                      onLoad={() => setIsIframeLoading(false)}
+                                    />
+                                  </div>
+                                </>
+                              );
+                            }
 
-                        return null;
-                      })()}
-                    </div>
-                  </motion.div>
-                )}
+                            if (viewerState.error) {
+                              return (
+                                <div className="absolute inset-0">
+                                  <ErrorDisplay
+                                    error={viewerState.error}
+                                    onAction={() => window.location.reload()}
+                                    className="h-full justify-center"
+                                  />
+                                </div>
+                              );
+                            }
+
+                            return null;
+                          })()}
+
+                          {/* Playing indicator overlay */}
+                          {isPlaying && (
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              className="absolute top-3 right-3 flex items-center gap-2 px-3 py-1.5 bg-ink-void/80 border border-gold/30"
+                            >
+                              <div className="w-2 h-2 bg-gold rounded-full animate-pulse" />
+                              <span className="text-2xs font-mono text-gold uppercase tracking-wider">Playing</span>
+                            </motion.div>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
+                </div>
               </motion.div>
             )}
 

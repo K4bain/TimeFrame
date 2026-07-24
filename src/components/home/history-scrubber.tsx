@@ -3,7 +3,6 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useReducedMotion } from "framer-motion";
-import { Tooltip } from "@/components/ui/tooltip";
 import {
   milestones,
   eraSegments,
@@ -15,17 +14,15 @@ import {
 /**
  * HistoryScrubber — homepage hero element.
  *
- * A full-width scrubber spanning the web's history (1991→today). Renders:
- *  - era bands colored per the era-tint tokens
- *  - milestone dots with hover tooltips showing the year + label
- *  - a playhead that sweeps across on mount (or sits static under
- *    prefers-reduced-motion)
+ * One single coordinate frame: every element (era bands, milestone dots,
+ * year labels, decade ticks) is positioned by its real temporal position
+ * via `yearToPercent`. This guarantees the era bands, dots, and axis all
+ * agree — nothing can drift out of alignment.
  *
- * Clicking a milestone jumps to a search for the associated site — so the
- * timeline functions as a discovery surface, not decoration.
+ * Clicking a milestone jumps to a search for the associated site.
  *
- * Year labels are staggered into two rows to prevent collisions when
- * milestones are temporally close (e.g. 2004/2005).
+ * Label collisions are resolved by a greedy column-packing algorithm that
+ * assigns each label to one of three vertical lanes based on its x-position.
  */
 export function HistoryScrubber() {
   const router = useRouter();
@@ -37,6 +34,7 @@ export function HistoryScrubber() {
 
   const [playhead, setPlayhead] = React.useState(reduced ? 100 : 0);
   const animatingRef = React.useRef<number | null>(null);
+  const [hoveredMilestone, setHoveredMilestone] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (reduced) {
@@ -63,125 +61,164 @@ export function HistoryScrubber() {
     router.push(`/search?q=${encodeURIComponent(site)}`);
   };
 
-  // Pre-compute milestone positions and detect collisions to stagger labels.
-  // Milestones within 6% width of each other get alternated to row 1 / row 2.
+  // Greedy lane assignment: each label needs ~8% width to not collide.
+  // Walk milestones left→right, assign the first lane whose last occupant
+  // is far enough away. Three lanes is enough for this dataset.
+  const MIN_LABEL_GAP = 8.5;
   const positionedMilestones = React.useMemo(() => {
-    let currentRow = 0;
-    let prevPct = -Infinity;
+    const lanes: number[] = [-Infinity, -Infinity, -Infinity];
     return milestones.map((m) => {
       const pct = yearToPercent(m.year);
-      if (pct - prevPct < 6) {
-        // Collides with previous — flip the row.
-        currentRow = currentRow === 0 ? 1 : 0;
-      } else {
-        currentRow = 0;
+      let lane = 0;
+      for (let i = 0; i < lanes.length; i++) {
+        if (pct - lanes[i] >= MIN_LABEL_GAP) {
+          lane = i;
+          break;
+        }
+        lane = i + 1 < lanes.length ? i + 1 : i;
       }
-      prevPct = pct;
-      return { ...m, pct, labelRow: currentRow };
+      if (lane >= lanes.length) lane = lanes.length - 1;
+      lanes[lane] = pct;
+      return { ...m, pct, lane };
     });
   }, [totalSpan]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Decade ticks positioned by actual temporal position (NOT evenly spaced).
+  // Decade ticks at real temporal positions: 2000, 2010, 2020.
   const decadeTicks = React.useMemo(() => {
     const ticks: { year: number; pct: number }[] = [];
-    for (let y = Math.ceil(MILESTONE_RANGE_START / 10) * 10; y <= MILESTONE_RANGE_END; y += 10) {
+    for (let y = 2000; y < MILESTONE_RANGE_END; y += 10) {
       ticks.push({ year: y, pct: yearToPercent(y) });
     }
     return ticks;
   }, [totalSpan]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const isHovered = (m: { label: string }) => hoveredMilestone === m.label;
+
   return (
-    <div className="w-full select-none" aria-label="Web history timeline, 1991 to today">
-      {/* Era bands */}
-      <div className="relative h-9 border border-rule bg-ink-void overflow-hidden">
-        {eraSegments.map((era) => {
-          const left = yearToPercent(era.start);
-          const width = yearToPercent(era.end) - left;
-          return (
-            <div
-              key={era.slug}
-              className="absolute top-0 bottom-0 border-r border-rule last:border-r-0 hover:opacity-70 transition-opacity duration-300"
-              style={{
-                left: `${left}%`,
-                width: `${width}%`,
-                backgroundColor: eraColorVar[era.slug],
-                opacity: 0.18,
-              }}
+    <div
+      className="w-full select-none"
+      aria-label="Web history timeline, 1991 to today"
+    >
+      {/* ─── The timeline rail (single coordinate frame) ─── */}
+      <div className="relative">
+        {/* Era bands */}
+        <div className="relative h-10 border border-rule bg-ink-void overflow-hidden">
+          {eraSegments.map((era) => {
+            const left = yearToPercent(era.start);
+            const width = yearToPercent(era.end) - left;
+            return (
+              <div
+                key={era.slug}
+                className="absolute top-0 bottom-0 border-r border-rule last:border-r-0 transition-opacity duration-300"
+                style={{
+                  left: `${left}%`,
+                  width: `${width}%`,
+                  backgroundColor: eraColorVar[era.slug],
+                  opacity: 0.16,
+                }}
+              >
+                {width > 10 && (
+                  <span className="absolute top-1.5 left-2 text-2xs font-mono uppercase tracking-wider text-paper-dim">
+                    {era.name}
+                  </span>
+                )}
+              </div>
+            );
+          })}
+
+          {/* Playhead */}
+          <div
+            className="absolute top-0 bottom-0 w-px bg-gold pointer-events-none z-20"
+            style={{ left: `${playhead}%` }}
+            aria-hidden="true"
+          >
+            <div className="absolute -top-1 -translate-x-1/2 w-2.5 h-2.5 rotate-45 bg-gold" />
+          </div>
+
+          {/* Milestone dots — sit ON the rail */}
+          {positionedMilestones.map((m) => (
+            <button
+              key={`dot-${m.label}`}
+              onClick={() => handleMilestoneClick(m.site)}
+              onMouseEnter={() => setHoveredMilestone(m.label)}
+              onMouseLeave={() => setHoveredMilestone(null)}
+              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 group"
+              style={{ left: `${m.pct}%` }}
+              aria-label={`${m.label} (${m.year}) — search ${m.site}`}
             >
-              {width > 9 && (
-                <span className="absolute top-1.5 left-2 text-2xs font-mono uppercase tracking-wider text-paper-dim">
-                  {era.name}
-                </span>
-              )}
-            </div>
-          );
-        })}
-
-        {/* Playhead */}
-        <div
-          className="absolute top-0 bottom-0 w-px bg-gold pointer-events-none z-10"
-          style={{ left: `${playhead}%` }}
-          aria-hidden="true"
-        >
-          <div className="absolute -top-0.5 -translate-x-1/2 w-2 h-2 rotate-45 bg-gold" />
+              <span
+                className={`block rounded-full transition-all duration-200 ${
+                  isHovered(m)
+                    ? "w-3 h-3 bg-gold ring-2 ring-gold/30 ring-offset-2 ring-offset-ink-void"
+                    : "w-2 h-2 bg-gold/60 hover:bg-gold"
+                }`}
+              />
+            </button>
+          ))}
         </div>
-      </div>
 
-      {/* Milestone dots (positioned on a baseline row) */}
-      <div className="relative h-6 mt-1">
+        {/* Hover tooltip — the label + year, shown on hover, anchored to dot */}
         {positionedMilestones.map((m) => (
           <div
-            key={m.label}
-            className="absolute top-0 -translate-x-1/2"
-            style={{ left: `${m.pct}%` }}
+            key={`tip-${m.label}`}
+            className={`absolute z-30 pointer-events-none -translate-x-1/2 transition-opacity duration-150 ${
+              isHovered(m) ? "opacity-100" : "opacity-0"
+            }`}
+            style={{ left: `${m.pct}%`, top: "-44px" }}
           >
-            <Tooltip content={`${m.year} · ${m.label}`}>
-              <button
-                onClick={() => handleMilestoneClick(m.site)}
-                className="group flex flex-col items-center pt-1"
-                aria-label={`${m.label} (${m.year}) — search ${m.site}`}
-              >
-                <span className="block w-1.5 h-1.5 rounded-full bg-gold/50 group-hover:bg-gold group-hover:scale-[1.8] transition-all duration-200" />
-              </button>
-            </Tooltip>
+            <div className="bg-ink-raised border border-gold/40 px-2.5 py-1 whitespace-nowrap text-center">
+              <span className="block font-mono text-gold text-xs leading-tight">{m.year}</span>
+              <span className="block font-serif text-paper text-xs leading-tight italic">{m.label}</span>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Year labels — staggered into two rows to prevent collision */}
-      <div className="relative h-10">
+      {/* ─── Year labels — three staggered lanes below the rail ─── */}
+      <div className="relative h-12 mt-1">
         {positionedMilestones.map((m) => (
-          <div
-            key={`label-${m.label}`}
-            className="absolute -translate-x-1/2 group/label"
+          <button
+            key={`lbl-${m.label}`}
+            onClick={() => handleMilestoneClick(m.site)}
+            onMouseEnter={() => setHoveredMilestone(m.label)}
+            onMouseLeave={() => setHoveredMilestone(null)}
+            className="absolute -translate-x-1/2"
             style={{
               left: `${m.pct}%`,
-              top: m.labelRow === 1 ? "20px" : "0px",
+              top: `${m.lane * 16}px`,
             }}
           >
-            <Tooltip content={`${m.label}`}>
-              <span className="text-2xs font-mono text-paper-dim group-hover/label:text-gold transition-colors whitespace-nowrap cursor-default">
-                {m.year}
-              </span>
-            </Tooltip>
-          </div>
+            <span
+              className={`text-2xs font-mono whitespace-nowrap transition-colors ${
+                isHovered(m) ? "text-gold font-medium" : "text-paper-dim hover:text-paper-faint"
+              }`}
+            >
+              {m.year}
+            </span>
+          </button>
         ))}
       </div>
 
-      {/* Decade axis — positioned by actual temporal position */}
-      <div className="relative h-6 mt-1 border-t border-rule pt-1">
+      {/* ─── Decade axis — ticks at real temporal positions ─── */}
+      <div className="relative h-5 mt-2 border-t border-rule">
         {decadeTicks.map((tick) => (
           <div
             key={tick.year}
             className="absolute top-0 -translate-x-1/2"
             style={{ left: `${tick.pct}%` }}
           >
-            <div className="w-px h-1.5 bg-rule-bright mx-auto" />
+            <div className="w-px h-1.5 bg-rule-bright" />
             <span className="absolute top-2.5 left-1/2 -translate-x-1/2 text-2xs font-mono text-paper-dim whitespace-nowrap">
               {tick.year}
             </span>
           </div>
         ))}
+      </div>
+
+      {/* Range endpoints */}
+      <div className="flex justify-between mt-7">
+        <span className="text-2xs font-mono text-gold font-medium">{MILESTONE_RANGE_START}</span>
+        <span className="text-2xs font-mono text-gold font-medium">{MILESTONE_RANGE_END}</span>
       </div>
     </div>
   );
