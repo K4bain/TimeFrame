@@ -8,9 +8,7 @@ import {
   AlertCircle,
   ChevronLeft,
   ChevronRight,
-  Calendar,
-  GitCompareArrows,
-  ArrowsLeftRight,
+  ArrowLeftRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -130,7 +128,7 @@ function BeforeAfterSlider({
         }}
       >
         <div className="w-10 h-10 border-2 border-gold bg-ink-void flex items-center justify-center">
-          <ArrowsLeftRight className="w-4 h-4 text-gold" />
+          <ArrowLeftRight className="w-4 h-4 text-gold" />
         </div>
       </div>
 

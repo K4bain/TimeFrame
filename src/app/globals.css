@@ -2,36 +2,33 @@
 @plugin "tailwindcss-animate";
 
 @theme {
-  /* ─── Typography ──────────────────────────────────────── */
   --font-sans: var(--font-geist), system-ui, -apple-system, sans-serif;
   --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
   --font-serif: var(--font-fraunces), Georgia, "Times New Roman", serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "Cascadia Code", monospace;
 
-  /* ─── Ink (dark ground — the default mode) ────────────── */
-  --color-ink-void: #0d0c0a;        /* page background */
-  --color-ink-panel: #16140f;       /* panel / card surface */
-  --color-ink-raised: #1f1c16;      /* elevated surface */
-  --color-ink-deep: #07060500;      /* unused placeholder for parity */
+  --color-ink-void: #0a0908;
+  --color-ink-panel: #13110d;
+  --color-ink-raised: #1c1914;
+  --color-ink-deep: #060504;
 
-  /* ─── Paper (text on ink) ─────────────────────────────── */
-  --color-paper: #ede7da;           /* primary text */
-  --color-paper-soft: #b8b0a0;      /* secondary text */
-  --color-paper-faint: #807a6e;     /* muted / meta */
-  --color-paper-dim: #56514a;       /* dimmest text */
+  --color-paper: #ede7da;
+  --color-paper-soft: #b8b0a0;
+  --color-paper-faint: #807a6e;
+  --color-paper-dim: #56514a;
 
-  /* ─── Hairlines ───────────────────────────────────────── */
-  --color-rule: #2a2620;            /* standard hairline */
-  --color-rule-bright: #3a352c;     /* brighter hairline on hover */
-  --color-rule-gold: #4a3a1e;       /* gold-tinted hairline */
+  --color-rule: #2a2620;
+  --color-rule-bright: #3a352c;
+  --color-rule-gold: #4a3a1e;
 
-  /* ─── Gold (the single accent) ────────────────────────── */
-  --color-gold: #c89545;            /* primary accent on dark */
-  --color-gold-bright: #d9a65a;     /* hover */
-  --color-gold-deep: #a8742a;       /* active / pressed */
-  --color-gold-faint: rgba(200, 149, 69, 0.12); /* tint backgrounds */
+  --color-gold: #c89545;
+  --color-gold-bright: #d9a65a;
+  --color-gold-deep: #a8742a;
+  --color-gold-faint: rgba(200, 149, 69, 0.12);
 
-  /* ─── Status (muted, in keeping with the palette) ─────── */
+  --color-cream: #f5e6c8;
+  --color-cream-bright: #faf0dc;
+
   --color-error: #c47168;
   --color-error-bg: rgba(196, 113, 104, 0.08);
   --color-error-border: rgba(196, 113, 104, 0.25);
@@ -39,7 +36,6 @@
   --color-success-bg: rgba(143, 168, 106, 0.08);
   --color-success-border: rgba(143, 168, 106, 0.25);
 
-  /* ─── Era tints (warm earth tones — museum vitrine glass) */
   --color-era-early-web: #6b5a3b;
   --color-era-browser-wars: #8a6b3a;
   --color-era-post-crash: #7a4a33;
@@ -49,24 +45,21 @@
   --color-era-platform-web: #c89545;
   --color-era-ai-transition: #7a8a6a;
 
-  /* ─── Radius (sharp — catalogue frames have no curve) ─── */
-  --radius-xs: 0px;
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
-  --radius-2xl: 0px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
   --radius-full: 9999px;
 
-  /* ─── Shadows (flat — depth from hairlines, not blur) ─── */
-  --shadow-sm: none;
-  --shadow-md: none;
-  --shadow-lg: none;
-  --shadow-xl: none;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+  --shadow-xl: 0 16px 48px rgba(0,0,0,0.6);
 
   --text-2xs: 0.625rem;
 
-  /* ─── Motion (quiet, considered) ──────────────────────── */
   --dur-instant: 0ms;
   --dur-fast: 100ms;
   --dur-quick: 160ms;
@@ -84,7 +77,6 @@
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
 
-  /* ─── Background / surface aliases (legacy compat) ────── */
   --color-bg-base: var(--color-ink-void);
   --color-bg-surface: var(--color-ink-panel);
   --color-bg-elevated: var(--color-ink-raised);
@@ -93,20 +85,17 @@
   --color-bg-selected: #2a2620;
   --color-bg-disabled: var(--color-ink-panel);
 
-  /* ─── Glass (remapped to opaque surfaces — no blur) ───── */
-  --color-glass-bg: var(--color-ink-panel);
-  --color-glass-bg-strong: var(--color-ink-raised);
-  --color-glass-border: var(--color-rule);
-  --color-glass-border-hover: var(--color-rule-bright);
+  --color-glass-bg: rgba(19, 17, 13, 0.85);
+  --color-glass-bg-strong: rgba(28, 25, 20, 0.92);
+  --color-glass-border: rgba(42, 38, 32, 0.6);
+  --color-glass-border-hover: rgba(58, 53, 44, 0.8);
 
-  /* ─── Borders ─────────────────────────────────────────── */
   --color-border-subtle: var(--color-rule);
   --color-border-default: var(--color-rule-bright);
   --color-border-strong: #4a4438;
   --color-border-focus: var(--color-gold);
   --color-border-focus-neutral: var(--color-paper-faint);
 
-  /* ─── Text ────────────────────────────────────────────── */
   --color-text-primary: var(--color-paper);
   --color-text-secondary: var(--color-paper-soft);
   --color-text-tertiary: var(--color-paper-faint);
@@ -116,7 +105,6 @@
   --color-text-link: var(--color-gold);
   --color-text-link-hover: var(--color-gold-bright);
 
-  /* ─── Amber / Gold scales ─────────────────────────────── */
   --color-amber-50:  #fdf6e9;
   --color-amber-100: #f5e6c8;
   --color-amber-200: #ecd49b;
@@ -126,13 +114,11 @@
   --color-amber-600: #8a5e1e;
   --color-amber-700: #6b4818;
 
-  /* ─── Cyan scale (kept for parity, rarely used) ───────── */
   --color-cyan-300: #8aa3a8;
   --color-cyan-400: #6e8c92;
   --color-cyan-500: #557580;
   --color-cyan-600: #3f5a66;
 
-  /* ─── Temporal (legacy compat — remapped to gold) ─────── */
   --color-temporal-primary: var(--color-gold);
   --color-temporal-hover: var(--color-gold-bright);
   --color-temporal-subtle: var(--color-gold-bright);
@@ -141,11 +127,9 @@
   --color-temporal-border: var(--color-gold-deep);
   --color-temporal-bg: var(--color-gold-faint);
 
-  /* ─── Status aliases ──────────────────────────────────── */
   --color-info: var(--color-gold);
   --color-info-bg: var(--color-gold-faint);
 
-  /* ─── Legacy aliases ──────────────────────────────────── */
   --color-background: var(--color-ink-void);
   --color-foreground: var(--color-paper);
   --color-muted: var(--color-paper-dim);
@@ -166,23 +150,18 @@
   --color-ring: var(--color-gold);
   --color-input: var(--color-rule);
 
-  /* ─── Shadow aliases (kept for compat — no-op) ────────── */
-  --shadow-glow-amber: none;
-  --shadow-glow-cyan: none;
-  --shadow-temporal: inset 0 -1px 0 var(--color-gold);
+  --shadow-glow-amber: 0 0 20px rgba(200, 149, 69, 0.15), 0 0 60px rgba(200, 149, 69, 0.05);
+  --shadow-glow-cyan: 0 0 20px rgba(110, 140, 146, 0.15), 0 0 60px rgba(110, 140, 146, 0.05);
+  --shadow-temporal: inset 0 -1px 0 var(--color-gold), 0 2px 8px rgba(0,0,0,0.3);
 
-  /* ─── Animation tokens (kept for compat — minimal) ────── */
   --animate-shimmer: tf-shimmer 1.6s linear infinite;
-  --animate-aurora-drift: none;
-  --animate-aurora-drift-slow: none;
-  --animate-float: none;
-  --animate-pulse-glow: none;
+  --animate-aurora-drift: aurora-drift 8s ease-in-out infinite;
+  --animate-aurora-drift-slow: aurora-drift 16s ease-in-out infinite;
+  --animate-float: tf-float 6s ease-in-out infinite;
+  --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
 }
 
-/* ─── Base ──────────────────────────────────────────────── */
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
   font-family: var(--font-sans);
@@ -194,7 +173,6 @@ body {
   font-feature-settings: "kern", "liga", "calt";
 }
 
-/* ─── Display type (serif — the signature) ──────────────── */
 .text-display {
   font-family: var(--font-display);
   font-weight: 400;
@@ -211,7 +189,6 @@ body {
   font-variation-settings: "opsz" 144, "SOFT" 0;
 }
 
-/* ─── Editorial meta / colophon type ────────────────────── */
 .text-colophon {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
@@ -228,112 +205,142 @@ body {
   color: var(--color-gold);
 }
 
-/* ─── Compatibility classes (remapped, no visual gimmick) ─ */
-.tf-glass,
+.tf-glass {
+  background: var(--color-glass-bg);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  border: 1px solid var(--color-glass-border);
+}
+
 .tf-glass-strong {
-  background: var(--color-ink-panel);
-  border: 1px solid var(--color-rule);
+  background: var(--color-glass-bg-strong);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid var(--color-glass-border-hover);
 }
 
-.tf-text-gradient,
-.tf-text-gradient-cool,
+.tf-text-gradient {
+  background: linear-gradient(135deg, var(--color-gold), var(--color-cream), var(--color-gold-bright));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 4s ease-in-out infinite;
+}
+
+.tf-text-gradient-cool {
+  background: linear-gradient(135deg, var(--color-cyan-300), var(--color-gold), var(--color-cyan-400));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 5s ease-in-out infinite;
+}
+
 .tf-text-gradient-split {
-  background: none;
-  -webkit-text-fill-color: currentColor;
-  color: var(--color-paper);
+  background: linear-gradient(90deg, var(--color-gold), var(--color-paper), var(--color-gold));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 6s ease-in-out infinite;
 }
 
-.tf-glow-amber,
-.tf-glow-cyan {
-  box-shadow: none;
-}
+.tf-glow-amber { box-shadow: var(--shadow-glow-amber); }
+.tf-glow-cyan { box-shadow: var(--shadow-glow-cyan); }
 
 .tf-grain::after {
-  content: none;
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  mix-blend-mode: overlay;
+  z-index: 1;
 }
 
 .tf-aurora {
-  display: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.tf-aurora::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    transparent 0deg,
+    rgba(200, 149, 69, 0.04) 60deg,
+    transparent 120deg,
+    rgba(110, 140, 146, 0.03) 200deg,
+    transparent 280deg,
+    rgba(200, 149, 69, 0.02) 340deg,
+    transparent 360deg
+  );
+  animation: aurora-drift 16s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .tf-shimmer {
-  background: none;
+  background: linear-gradient(90deg, var(--color-ink-panel) 0%, var(--color-ink-raised) 40%, var(--color-gold-faint) 50%, var(--color-ink-raised) 60%, var(--color-ink-panel) 100%);
+  background-size: 300% 100%;
+  animation: tf-shimmer 2.4s ease-in-out infinite;
 }
 
-/* ─── Skeleton (functional loading only) ────────────────── */
-.tf-skeleton {
-  background-color: var(--color-ink-panel);
-}
+.tf-skeleton { background-color: var(--color-ink-panel); }
 
 .tf-skeleton--shimmer {
-  background: linear-gradient(
-    90deg,
-    var(--color-ink-panel) 0%,
-    var(--color-ink-raised) 50%,
-    var(--color-ink-panel) 100%
-  );
-  background-size: 200% 100%;
-  animation: tf-shimmer 1.6s linear infinite;
-  animation-delay: 800ms;
+  background: linear-gradient(90deg, var(--color-ink-panel) 0%, var(--color-ink-raised) 40%, rgba(200, 149, 69, 0.06) 50%, var(--color-ink-raised) 60%, var(--color-ink-panel) 100%);
+  background-size: 300% 100%;
+  animation: tf-shimmer 2s ease-in-out infinite;
+  animation-delay: 200ms;
 }
 
 @keyframes tf-shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
-/* ─── Pulse glow (compat — subtle opacity for status dots) */
 @keyframes pulse-glow {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
+  0%, 100% { opacity: 0.5; box-shadow: 0 0 8px rgba(200, 149, 69, 0.2); }
+  50% { opacity: 1; box-shadow: 0 0 20px rgba(200, 149, 69, 0.4); }
 }
 
-/* ─── Float (compat — disabled) ─────────────────────────── */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(0); }
+@keyframes tf-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-6px) rotate(1deg); }
+  66% { transform: translateY(-3px) rotate(-1deg); }
 }
 
-/* ─── Selection ─────────────────────────────────────────── */
-::selection {
-  background: var(--color-gold-faint);
-  color: var(--color-gold-bright);
+@keyframes aurora-drift {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(180deg); }
+  100% { transform: rotate(360deg); }
 }
 
-/* ─── Scrollbar (subtle, in-keeping) ────────────────────── */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-::-webkit-scrollbar-track {
-  background: var(--color-ink-void);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--color-rule);
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-rule-bright);
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 200% center; }
 }
 
-/* ─── Focus-visible (editorial gold ring) ──────────────── */
-:focus-visible {
-  outline: 1px solid var(--color-gold);
-  outline-offset: 2px;
-}
-
-/* ─── Keyframe: gold pulse for live indicators ─────────── */
 @keyframes gold-pulse {
   0%, 100% { opacity: 0.4; }
   50% { opacity: 1; }
 }
 
-/* ─── Marquee-style subtle text shimmer on h1 ───────────── */
 @keyframes text-breathe {
   0%, 100% { opacity: 0.95; }
   50% { opacity: 1; }
 }
 
-/* ─── Line rule animation (reveal on scroll) ────────────── */
 @keyframes rule-reveal {
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }
@@ -344,11 +351,50 @@ body {
   animation: rule-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* ─── Reduced motion ────────────────────────────────────── */
+@keyframes particle-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  50% { transform: translate(var(--drift-x, 30px), var(--drift-y, -40px)) scale(1.2); }
+}
+
+.tf-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.tf-particles span {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: var(--color-gold);
+  border-radius: 50%;
+  opacity: 0;
+  animation: particle-drift var(--duration, 8s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+::selection {
+  background: var(--color-gold-faint);
+  color: var(--color-gold-bright);
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--color-ink-void); }
+::-webkit-scrollbar-thumb { background: var(--color-rule); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-rule-bright); }
+
+:focus-visible {
+  outline: 1px solid var(--color-gold);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -356,15 +402,7 @@ body {
   }
 }
 
-/* ─── Print (editorial: clean monograph output) ────────── */
 @media print {
-  body {
-    background: white;
-    color: black;
-  }
-  .tf-aurora,
-  nav,
-  header {
-    display: none;
-  }
+  body { background: white; color: black; }
+  .tf-aurora::before, .tf-particles, nav, header { display: none; }
 }

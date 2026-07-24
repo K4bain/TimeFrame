@@ -16,13 +16,9 @@ interface SiteData {
   firstCapture: string;
   lastCapture: string;
   totalCaptures: number;
-  yearCounts: number[];  // yearly snapshot counts for sparkline
+  yearCounts: number[];
 }
 
-/**
- * MiniSparkline — a tiny inline bar chart showing capture density
- * by year. Gives each exhibit a visual "heartbeat".
- */
 function MiniSparkline({ data, max }: { data: number[]; max: number }) {
   if (data.length === 0) return null;
   const localMax = Math.max(...data, 1);
@@ -44,7 +40,6 @@ function CollectionsContent() {
   const utils = trpc.useUtils();
 
   useEffect(() => {
-    // Load data for all sites across all collections
     const allSites = collections.flatMap((c) => c.websites);
     const uniqueSites = [...new Set(allSites)];
 
@@ -57,9 +52,8 @@ function CollectionsContent() {
           try {
             const data = await utils.archive.getTimeline.fetch({ domain: site });
             if (data.success && data.data.totalCount > 0) {
-              // Extract yearly counts
               const yearCounts: Record<number, number> = {};
-              for (const capture of data.data.captures.slice(0, 200)) {
+              for (const capture of data.data.snapshots.slice(0, 200)) {
                 const year = parseInt(capture.timestamp.slice(0, 4), 10);
                 yearCounts[year] = (yearCounts[year] || 0) + 1;
               }
@@ -109,7 +103,7 @@ function CollectionsContent() {
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-px bg-rule">
+        <div className="grid sm:grid-cols-2 gap-3">
           {collections.map((collection, i) => {
             const siteData = collection.websites
               .map((site) => siteDataMap[site])
@@ -118,7 +112,6 @@ function CollectionsContent() {
             const totalCaptures = siteData.reduce((sum, d) => sum + d.totalCaptures, 0);
             const allYearCounts = siteData.reduce<number[]>((acc, d) => {
               if (acc.length === 0) return d.yearCounts;
-              // Merge year counts
               const merged = [...acc];
               for (let j = 0; j < d.yearCounts.length && j < merged.length; j++) {
                 merged[merged.length - 1 - (merged.length - 1 - Math.min(j, merged.length - 1))] =
@@ -134,7 +127,7 @@ function CollectionsContent() {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.4, ease: HERO_EASE, delay: i * 0.05 }}
               >
-                <Link href={`/collections/${collection.id}`} className="group block h-full bg-ink-void p-8 md:p-10 hover:bg-ink-panel transition-colors duration-300">
+                <Link href={`/collections/${collection.id}`} className="group block h-full bg-ink-panel p-8 md:p-10 rounded-xl border border-rule hover:border-gold/30 hover:bg-ink-raised hover:shadow-[var(--shadow-glow-amber)] transition-all duration-300">
                   <div className="text-colophon mb-6">
                     {String(i + 1).padStart(2, "0")} — {collection.websites.length} sites
                     {totalCaptures > 0 && (
@@ -150,14 +143,12 @@ function CollectionsContent() {
                     {collection.description}
                   </p>
 
-                  {/* Sparkline */}
                   {allYearCounts.length > 0 && (
                     <div className="mb-6 opacity-40 group-hover:opacity-80 transition-opacity">
                       <MiniSparkline data={allYearCounts} max={0} />
                     </div>
                   )}
 
-                  {/* Site list preview */}
                   <div className="space-y-1.5 mb-6">
                     {collection.websites.slice(0, 3).map((site) => {
                       const data = siteDataMap[site];
@@ -197,7 +188,7 @@ function CollectionsContent() {
 
 export default function CollectionsPage() {
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen tf-aurora">
       <SiteHeader
         backHref="/"
         backLabel="Back to home"

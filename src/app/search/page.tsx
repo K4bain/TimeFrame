@@ -76,7 +76,7 @@ function SearchContent() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="flex flex-col items-center justify-center py-24"
+              className="flex flex-col items-center justify-center py-24 relative z-10"
             >
               <Loader2 className="w-6 h-6 text-paper-dim animate-spin mb-4" />
               <p className="text-colophon">Searching the archive</p>
@@ -107,7 +107,6 @@ function SearchContent() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, ease: HERO_EASE }}
             >
-              {/* Results header */}
               <div className="mb-12 pb-6 border-b border-rule">
                 <span className="text-eyebrow">Results</span>
                 <h1 className="text-display text-4xl md:text-6xl text-paper mt-3 mb-4">
@@ -122,7 +121,6 @@ function SearchContent() {
                 </div>
               </div>
 
-              {/* Results list — hairline-separated rows */}
               <div className="border-t border-rule">
                 {result.captures.slice(0, 20).map((capture) => {
                   const era = getEra(capture.timestamp);
@@ -131,9 +129,9 @@ function SearchContent() {
                     <Link
                       key={capture.timestamp}
                       href={`/explore/${result.site}/${capture.timestamp}`}
-                      className="block group border-b border-rule hover:bg-ink-panel transition-colors duration-200"
+                      className="block group border-b border-rule hover:bg-ink-panel/50 rounded-lg mb-1 hover:shadow-sm hover:border-gold/20 transition-all duration-200"
                     >
-                      <div className="py-4 px-1 flex items-center justify-between gap-6">
+                      <div className="py-4 px-3 flex items-center justify-between gap-6">
                         <div className="min-w-0">
                           <div className="flex items-baseline gap-3 mb-1">
                             <span className="font-mono text-gold text-sm">
@@ -170,13 +168,13 @@ function SearchContent() {
           )}
 
           {!isLoading && !error && !result && initialQuery && (
-            <div className="flex flex-col items-center justify-center py-24">
+            <div className="flex flex-col items-center justify-center py-24 relative z-10">
               <p className="text-paper-faint">No results found for &ldquo;{initialQuery}&rdquo;</p>
             </div>
           )}
 
           {!isLoading && !error && !result && !initialQuery && (
-            <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="relative z-10 flex flex-col items-center justify-center py-24 text-center">
               <span className="text-eyebrow mb-4">Begin</span>
               <h2 className="text-display text-3xl text-paper mb-3">Search a website</h2>
               <p className="text-paper-faint max-w-md">

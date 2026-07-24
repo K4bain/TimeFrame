@@ -79,7 +79,7 @@ function CollectionDetailContent() {
             if (data.success && data.data.totalCount > 0) {
               // Build year counts
               const yearCounts: Record<number, number> = {};
-              for (const capture of data.data.captures.slice(0, 200)) {
+              for (const capture of data.data.snapshots.slice(0, 200)) {
                 const year = parseInt(capture.timestamp.slice(0, 4), 10);
                 yearCounts[year] = (yearCounts[year] || 0) + 1;
               }
